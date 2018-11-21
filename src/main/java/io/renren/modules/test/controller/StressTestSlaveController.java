@@ -106,4 +106,13 @@ public class StressTestSlaveController {
         stressTestSlaveService.updateBatchStatus(slaveIds, status);
         return R.ok();
     }
+    /**
+     * 校准当前各节点状态（以前台页面状态为准，校准后台进程）
+     */
+    @SysLog("校准当前各节点状态")
+    @RequestMapping("/batchReload")
+    public R batchReload() {
+        stressTestSlaveService.batchReloadStatus();
+        return R.ok();
+    }
 }

@@ -156,6 +156,23 @@ var vm = new Vue({
                 }
             });
         },
+        batchReload: function () {
+            $.ajax({
+                type: "POST",
+                url: baseURL + "test/stressSlave/batchReload",
+                contentType: "application/json",
+                data: "",
+                success: function (r) {
+                    if (r.code == 0) {
+                        alert('校准完成，前后台状态同步一致！', function () {
+                            vm.reload();
+                        });
+                    } else {
+                        alert(r.msg);
+                    }
+                }
+            });
+        },
         reload: function (event) {
             vm.showList = true;
             var page = $("#jqGrid").jqGrid('getGridParam', 'page');

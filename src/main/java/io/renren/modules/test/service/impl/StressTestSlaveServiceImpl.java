@@ -100,10 +100,16 @@ public class StressTestSlaveServiceImpl implements StressTestSlaveService {
             //如果是启用节点
             if (StressTestUtils.ENABLE.equals(status)) {
 
-                if (StressTestUtils.ENABLE.equals(slave.getStatus())) {
-                    //本身已经是启用状态
-                    throw new RRException(slave.getSlaveName() + " 已经启动不要重复启动！");
-                }
+            	//启动前先检查进程，避免重复启动导致端口占用
+            	String psStr = ssh2Util.runCommand("ps -efww|grep -w 'jmeter-server'|grep -v grep|cut -c 9-15");
+            	if(!psStr.equals("")){
+            		//本身已经是启用状态
+            		if (StressTestUtils.ENABLE.equals(slave.getStatus())){
+            			throw new RRException(slave.getSlaveName() + " 已经启动不要重复启动！");
+            		} else {
+            			throw new RRException(slave.getSlaveName() + " 节点机进程有冲突，请先校准！");
+            		}
+            	}
 
                 // 避免跨系统的问题，远端由于都时linux服务器，则文件分隔符统一为/，不然同步文件会报错。
                 String jmeterServer = slave.getHomeDir() + "/bin/jmeter-server";
@@ -146,5 +152,75 @@ public class StressTestSlaveServiceImpl implements StressTestSlaveService {
      */
     public boolean checkMD5(String md5Str) {
         return Pattern.matches("^([a-fA-F0-9]{32})$", md5Str);
+    }
+    
+    /**
+     * 根据数据库中各节点状态，重置一遍后台进程状态
+     */
+    @Override
+    public void batchReloadStatus(){
+    	//当前是向所有的分布式节点推送这个，阻塞操作+轮询，并非多线程，因为本地同步网卡会是瓶颈。
+    	//先处理已禁用的进程
+        Map query = new HashMap<>();
+        query.put("status", StressTestUtils.DISABLE);      
+        List<StressTestSlaveEntity> stressTestSlaveList = stressTestSlaveDao.queryList(query);
+        for (StressTestSlaveEntity slave : stressTestSlaveList) {
+            // 本机配置IP为127.0.0.1，没配置localhost
+            if ("127.0.0.1".equals(slave.getIp().trim())) {
+            	continue;
+            }else{
+            	SSH2Utils ssh2Util = new SSH2Utils(slave.getIp(), slave.getUserName(),
+                        slave.getPasswd(), Integer.parseInt(slave.getSshPort()));
+                try {
+                	ssh2Util.initialSession();
+                	try {
+                		//界面状态显示禁用，重置过程就是杀死节点已存在的进程
+                		ssh2Util.runCommand("ps -efww|grep -w 'jmeter-server'|grep -v grep|cut -c 9-15|xargs kill -9");
+					} catch (IOException e) {
+						throw new RRException(slave.getSlaveName() + "节点机传输数据失败！", e);
+					}
+                } catch (JSchException e){
+                    throw new RRException(slave.getSlaveName() + "初始化远程节点机链接失败！请核对节点机连接信息！", e);
+                } finally {
+                    try {
+                        ssh2Util.close();
+                    } catch (Exception e) {
+                        throw new RRException(slave.getSlaveName() + "节点机远程链接关闭时失败！", e);
+                    }
+                }
+            }
+        }
+        //再处理已启用的进程
+        query.put("status", StressTestUtils.ENABLE);       
+        List<StressTestSlaveEntity> stressTestSlaveList2 = stressTestSlaveDao.queryList(query);
+        for (StressTestSlaveEntity slave : stressTestSlaveList2) {
+        	// 本机配置IP为127.0.0.1，没配置localhost
+            if ("127.0.0.1".equals(slave.getIp().trim())) {
+            	continue;
+            }else{
+            	SSH2Utils ssh2Util = new SSH2Utils(slave.getIp(), slave.getUserName(),
+                        slave.getPasswd(), Integer.parseInt(slave.getSshPort()));
+                try {
+                	ssh2Util.initialSession();
+                	try {
+                		//界面状态显示启用，后台不存在进程就远程启动
+                		String psStr = ssh2Util.runCommand("ps -efww|grep -w 'jmeter-server'|grep -v grep|cut -c 9-15");
+                		if(psStr.equals("")){
+                			runOrDownSlave(slave,1);
+                		}
+					} catch (IOException e) {
+						throw new RRException(slave.getSlaveName() + "节点机传输数据失败！", e);
+					}
+                } catch (JSchException e){
+                    throw new RRException(slave.getSlaveName() + "初始化远程节点机链接失败！请核对节点机连接信息！", e);
+                } finally {
+                    try {
+                        ssh2Util.close();
+                    } catch (Exception e) {
+                        throw new RRException(slave.getSlaveName() + "节点机远程链接关闭时失败！", e);
+                    }
+                }
+            }
+        }
     }
 }

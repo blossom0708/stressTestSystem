@@ -88,7 +88,7 @@ CREATE TABLE `sys_log` (
 
 -- 初始数据 
 INSERT INTO `sys_user` (`user_id`, `username`, `password`, `salt`, `email`, `mobile`, `status`, `create_user_id`, `create_time`) VALUES ('1', 'admin', '9ec9750e709431dad22365cabc5c625482e574c74adaebba7dd02f1129e4ce1d', 'YzcmCZNvbXocrsz9dm8e', 'root@renren.io', '13612345678', '1', '1', '2016-11-11 11:11:11');
-INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('1', '0', '系统管理', NULL, NULL, '0', 'fa fa-cog', '0');
+INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('1', '0', '系统管理', NULL, NULL, '0', 'fa fa-cog', '1');
 INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('2', '1', '管理员列表', 'modules/sys/user.html', NULL, '1', 'fa fa-user', '1');
 INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('3', '1', '角色管理', 'modules/sys/role.html', NULL, '1', 'fa fa-user-secret', '2');
 INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('4', '1', '菜单管理', 'modules/sys/menu.html', NULL, '1', 'fa fa-th-list', '3');
@@ -444,7 +444,7 @@ CREATE TABLE `test_stress_slave` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='性能测试分布式节点表';
 
 -- 让本机master配置后也可以参与性能测试，默认是禁用master主节点
-INSERT INTO `test_stress_slave` (`slave_id`, `slave_name`, `ip`, `jmeter_port`, `user_name`, `passwd`, `ssh_port`, `home_dir`, `status`, `add_time`, `add_by`, `update_time`, `update_by`) VALUES ('1', 'LocalHost', '127.0.0.1', '0', NULL, NULL, '22', '', '0', '2018-06-18 18:18:18', NULL, '2018-06-18 18:18:18', NULL);
+INSERT INTO `test_stress_slave` (`slave_id`, `slave_name`, `ip`, `jmeter_port`, `user_name`, `passwd`, `ssh_port`, `home_dir`, `status`, `add_time`, `add_by`, `update_time`, `update_by`) VALUES ('1', 'LocalHost', '127.0.0.1', '1099', NULL, NULL, '22', '', '0', '2018-06-18 18:18:18', NULL, '2018-06-18 18:18:18', NULL);
 
 -- 数据库中配置性能压测配置信息。key不要变。
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('2', 'MASTER_JMETER_HOME_KEY', 'D:\\software\\apache-jmeter-4.0', '1', '本地Jmeter_home绝对路径');
@@ -453,5 +453,31 @@ INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('4',
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('5', 'MASTER_JMETER_REPLACE_FILE_KEY', 'true', '1', '上传文件时，遇到同名文件是替换还是报错，默认是替换为true');
 
 
--- 还没有完全实现的测试场景组装功能
-INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('36', '31', '测试场景组装', 'modules/test/stressTestAssembly.html', 'test:stress', '1', 'fa fa-clipboard', '5');
+-- Grafana监控视图
+INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('36', '31', 'Grafana监控视图', 'modules/test/stressTestAssembly.html', 'test:stress', '1', 'fa fa-clipboard', '5');
+
+-- 修改test_stress_case_file表(smooth 20181205)
+ALTER TABLE `test_stress_case_file` CHANGE `weblog_status` `debug_status` tinyint NOT NULL DEFAULT 0;
+ALTER TABLE `test_stress_case_file` MODIFY column `debug_status` tinyint  NOT NULL DEFAULT 0 comment '状态  0：关闭debug  1：开始debug调试模式';
+
+-- 调试/接口测试报告文件表(smooth 20181205)
+CREATE TABLE `test_debug_case_reports` (
+  `report_id` bigint NOT NULL AUTO_INCREMENT,
+  `case_id` bigint NOT NULL COMMENT '所关联的用例',
+  `file_id` bigint NOT NULL COMMENT '所关联的用例文件',
+  `origin_name` varchar(200) NOT NULL COMMENT '测试报告名称',
+  `report_name` varchar(200) NOT NULL COMMENT '避免跨系统编码错误，随机化了结果文件名，存储了相对路径',
+  `file_size` bigint COMMENT '测试结果文件大小',
+  `status` int NOT NULL DEFAULT 0 COMMENT '状态  0：初始状态  1：正在运行  2：成功执行  3：运行出现异常',
+  `remark` varchar(300) COMMENT '描述',
+  `add_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `add_by` bigint(20) COMMENT '提交用户id',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  `update_by` bigint(20) COMMENT '修改用户id',
+  PRIMARY KEY (`report_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='调试/接口测试报告文件表';
+
+-- 修改菜单，添加调试报告管理界面（smooth 20181205）
+update `sys_menu` set `menu_id`='37',`order_num`='6' where `menu_id`='36';
+update `sys_menu` set `menu_id`='36',`order_num`='5' where `menu_id`='35';
+INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('35', '31', '调试报告管理', 'modules/test/debugTestReports.html', 'test:debug', '1', 'fa fa-area-chart', '4');

@@ -68,11 +68,10 @@ public class StressTestFileEntity implements Serializable {
     private Integer webchartStatus;
 
     /**
-     * 状态  0：不需要前端显示日志  1：前端仅显示错误日志
-     *      2：前端仅显示正确日志   3：前端正确和错误日志都显示
+     * 状态 0：关闭debug  1：开始debug调试模式
      * 默认 0
      */
-    private Integer weblogStatus;
+    private Integer debugStatus;
 
     /**
      * 提交的用户
@@ -188,14 +187,6 @@ public class StressTestFileEntity implements Serializable {
         this.webchartStatus = webchartStatus;
     }
 
-    public Integer getWeblogStatus() {
-        return weblogStatus;
-    }
-
-    public void setWeblogStatus(Integer weblogStatus) {
-        this.weblogStatus = weblogStatus;
-    }
-
     public String getSlaveStr() {
         return slaveStr;
     }
@@ -227,6 +218,13 @@ public class StressTestFileEntity implements Serializable {
     public void setCaseName(String caseName) {
         this.caseName = caseName;
     }
+    
+    public Integer getDebugStatus() {
+        return debugStatus;
+    }
+     public void setDebugStatus(Integer debugStatus) {
+        this.debugStatus = debugStatus;
+    }
 
     public StressTestFileEntity clone() {
         StressTestFileEntity clone = new StressTestFileEntity();
@@ -238,7 +236,7 @@ public class StressTestFileEntity implements Serializable {
         clone.setSlaveStr(this.getSlaveStr());
         clone.setReportStatus(this.getReportStatus());
         clone.setWebchartStatus(this.getWebchartStatus());
-        clone.setWeblogStatus(this.getWeblogStatus());
+        clone.setDebugStatus(this.getDebugStatus());
         clone.setSlaveId(this.getSlaveId());
         return clone;
     }

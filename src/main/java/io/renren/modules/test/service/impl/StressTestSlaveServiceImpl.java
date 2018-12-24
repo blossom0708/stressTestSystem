@@ -117,10 +117,11 @@ public class StressTestSlaveServiceImpl implements StressTestSlaveService {
                 if (!checkMD5(md5Str)) {
                     throw new RRException(slave.getSlaveName() + " 节点路径错误！找不到jmeter-server启动文件！");
                 }
-                //启动节点
+              //启动节点
                 String enableResult = ssh2Util.runCommand(
+                		"mkdir -p " + slave.getHomeDir() + "/bin/stressTestCases" + "\n" +
                         "cd " + slave.getHomeDir() + "/bin/stressTestCases/" + "\n" +
-                        "sh " + "../jmeter-server");
+                        "sh " + "../jmeter-server -Djava.rmi.server.hostname="+slave.getIp());
 
                 logger.error(enableResult);
 

@@ -285,8 +285,6 @@ function runOnce(fileIds) {
                 vm.reload();
                 alert(r.msg, function () {
                 });
-            } else {
-                alert(r.msg);
             }
         }
     });

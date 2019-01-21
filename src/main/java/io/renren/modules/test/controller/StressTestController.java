@@ -186,12 +186,14 @@ public class StressTestController {
     public R delete(@RequestBody Long[] caseIds) {
         // 先删除其下的脚本文件。
         for (Long caseId : caseIds) {
-            ArrayList fileIdList = new ArrayList();
             List<StressTestFileEntity> fileList = stressTestFileService.queryList(caseId);
-            for (StressTestFileEntity stressTestFile : fileList) {
-                fileIdList.add(stressTestFile.getFileId());
-            }
-            stressTestFileService.deleteBatch(fileIdList.toArray());
+            if(fileList.size()>0){ //判断是否有关联脚本文件
+            	ArrayList fileIdList = new ArrayList();
+            	for (StressTestFileEntity stressTestFile : fileList) {
+                    fileIdList.add(stressTestFile.getFileId());
+                }
+                stressTestFileService.deleteBatch(fileIdList.toArray());
+            }  
         }
         // 后删除用例
         stressTestService.deleteBatch(caseIds);

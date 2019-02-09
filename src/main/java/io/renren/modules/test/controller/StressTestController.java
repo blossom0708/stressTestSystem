@@ -195,7 +195,7 @@ public class StressTestController {
         // 先删除其下的脚本文件。
         for (Long caseId : caseIds) {
             List<StressTestFileEntity> fileList = stressTestFileService.queryList(caseId);
-            if(fileList.size()>0){ //判断是否有关联脚本文件
+            if(!fileList.isEmpty()){ //判断是否有关联脚本文件
             	ArrayList fileIdList = new ArrayList();
             	for (StressTestFileEntity stressTestFile : fileList) {
                     fileIdList.add(stressTestFile.getFileId());
@@ -204,7 +204,9 @@ public class StressTestController {
             }  
         }
         // 后删除用例
-        stressTestService.deleteBatch(caseIds);
+        if (caseIds.length > 0) {
+            stressTestService.deleteBatch(caseIds);
+        }
         return R.ok();
     }
 }

@@ -51,6 +51,11 @@ public interface StressTestReportsService {
      * 生成测试报告
      */
     void createReport(Long[] reportIds);
+    
+    /**
+     * 生成测试报告
+     */
+    void createReport(StressTestReportsEntity reportsEntity);
 
     /**
      * 批量删除测试报告的来源CSV文件

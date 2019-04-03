@@ -13,6 +13,7 @@ import io.renren.modules.test.jmeter.JmeterStatEntity;
 import io.renren.modules.test.jmeter.engine.LocalStandardJMeterEngine;
 import io.renren.modules.test.jmeter.fix.JavassistEngine;
 import io.renren.modules.test.service.StressTestFileService;
+import io.renren.modules.test.service.TestStressThreadSetService;
 import io.renren.modules.test.utils.SSH2Utils;
 import io.renren.modules.test.utils.StressTestUtils;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -31,6 +32,7 @@ import org.apache.jmeter.services.FileServer;
 import org.apache.jmeter.threads.RemoteThreadsListenerTestElement;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
+import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +73,12 @@ public class StressTestFileServiceImpl implements StressTestFileService {
 
     @Autowired
     private StressTestUtils stressTestUtils;
+    
+    @Autowired
+	private TestStressThreadSetDao testStressThreadSetDao;
+    
+    @Autowired
+    private TestStressThreadSetService testStressThreadSet;
 
     private static final String JAVA_CLASS_PATH = "java.class.path";
     private static final String CLASSPATH_SEPARATOR = File.pathSeparator;
@@ -209,6 +217,17 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         // 肯定存在已有的用例信息
         stressTestDao.update(stressCase);
         stressTestUtils.saveFile(multipartFile, filePath);
+        // 对jmx脚本将线程组配置信息入库
+        if(filePath.substring(filePath.length()-3).equals("jmx")){
+        	try {
+        		//入库前清理已有配置项
+        		testStressThreadSetDao.deleteByFileId(stressTestFile.getFileId());
+    			testStressThreadSet.jmxSaveNodes(filePath, stressTestFile);
+    		} catch (DocumentException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+        }
     }
 
     @Override
@@ -300,6 +319,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         });
 
         stressTestFileDao.deleteBatch(fileIds);
+        testStressThreadSetDao.deleteBatchByFileIds(fileIds);//删除脚本关联的线程组配置信息
     }
 
     /**

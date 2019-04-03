@@ -452,7 +452,6 @@ INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('3',
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('4', 'MASTER_JMETER_USE_SCRIPT_KEY', 'false', '1', 'false:在服务器进程内启动Jmeter压测。true:启动Jmeter_home中的命令压测');
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('5', 'MASTER_JMETER_REPLACE_FILE_KEY', 'true', '1', '上传文件时，遇到同名文件是替换还是报错，默认是替换为true');
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('6', 'MASTER_JMETER_GENERATE_REPORT_KEY', 'true', '1', 'true:本地web程序进程生成测试报告，可以多线程并发生成。false:使用Jmeter_home中的命令生成测试报告。');
-
 -- Grafana监控视图
 INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('36', '31', 'Grafana监控视图', 'modules/test/stressTestAssembly.html', 'test:stress', '1', 'fa fa-clipboard', '5');
 
@@ -480,4 +479,22 @@ CREATE TABLE `test_debug_case_reports` (
 -- 修改菜单，添加调试报告管理界面（smooth 20181205）
 update `sys_menu` set `menu_id`='37',`order_num`='6' where `menu_id`='36';
 update `sys_menu` set `menu_id`='36',`order_num`='5' where `menu_id`='35';
-INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('35', '31', '调试报告管理', 'modules/test/debugTestReports.html', 'test:debug', '1', 'fa fa-area-chart', '4');
+INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('37', '31', '调试报告管理', 'modules/test/debugTestReports.html', 'test:debug', '1', 'fa fa-area-chart', '4');
+
+-- 添加线程组管理界面（smooth 20190402）
+-- 脚本线程组管理
+INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('38', '31', '脚本线程组管理', 'modules/test/stressThreadSet.html', 'test:teststressthreadset', '1', 'fa fa-clipboard', '6');
+INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('39', '38', '修改', NULL, 'test:teststressthreadset:update,test:teststressthreadset:select', '2', NULL, '0');
+DROP TABLE IF EXISTS `test_stress_thread_set`;
+CREATE TABLE `test_stress_thread_set` (
+  `set_id` varchar(40) NOT NULL,
+  `parent_id` varchar(40) DEFAULT NULL COMMENT '所属ID，一级配置为0',
+  `name` varchar(100) DEFAULT NULL COMMENT '配置名称',
+  `key` varchar(100) DEFAULT NULL COMMENT '配置项',
+  `value` varchar(100) DEFAULT NULL COMMENT '配置内容',
+  `type` int(11) DEFAULT NULL COMMENT '类型   0：脚本   1：线程组   2：配置',
+  `explain` varchar(200) DEFAULT NULL COMMENT '配置说明',
+  `order_num` int(11) DEFAULT '0' COMMENT '排序',
+  `file_id` bigint(20) DEFAULT NULL COMMENT '所属脚本文件ID',
+  PRIMARY KEY (`set_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='线程组管理';

@@ -106,9 +106,9 @@
             <version>${commons.lang.version}</version>
         </dependency>
         <!--<dependency>-->
-        <!--<groupId>commons-fileupload</groupId>-->
-        <!--<artifactId>commons-fileupload</artifactId>-->
-        <!--<version>${commons.fileupload.version}</version>-->
+            <!--<groupId>commons-fileupload</groupId>-->
+            <!--<artifactId>commons-fileupload</artifactId>-->
+            <!--<version>${commons.fileupload.version}</version>-->
         <!--</dependency>-->
         <dependency>
             <groupId>commons-io</groupId>
@@ -177,28 +177,30 @@
             </exclusions>
         </dependency>
         <!--性能测试-->
+		<!--&lt;!&ndash; https://mvnrepository.com/artifact/org.apache.jmeter/ApacheJMeter_http &ndash;&gt;-->
         <dependency>
             <groupId>org.apache.jmeter</groupId>
             <artifactId>ApacheJMeter_http</artifactId>
-            <version>${jmeter.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j-impl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+			<version>${jmeter.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-slf4j-impl</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.jmeter/ApacheJMeter_functions -->
         <dependency>
-            <groupId>org.apache.jmeter</groupId>
-            <artifactId>ApacheJMeter_functions</artifactId>
-            <version>${jmeter.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j-impl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+             <groupId>org.apache.jmeter</groupId>
+             <artifactId>ApacheJMeter_functions</artifactId>
+             <version>${jmeter.version}</version>
+             <exclusions>
+                 <exclusion>
+                     <groupId>org.apache.logging.log4j</groupId>
+                     <artifactId>log4j-slf4j-impl</artifactId>
+                 </exclusion>
+             </exclusions>
+         </dependency>
         <dependency>
             <groupId>org.apache.jmeter</groupId>
             <artifactId>ApacheJMeter_jdbc</artifactId>
@@ -227,7 +229,7 @@
             <artifactId>jaxp-api</artifactId>
             <version>1.4.2</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-exec -->
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-exec -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-exec</artifactId>
@@ -240,6 +242,13 @@
             <artifactId>ganymed-ssh2</artifactId>
             <version>build210</version>
         </dependency>
+        <!-- 操作脚本jmx文件 -->
+				<!-- https://mvnrepository.com/artifact/org.dom4j/dom4j -->
+				<dependency>
+    				<groupId>org.dom4j</groupId>
+    				<artifactId>dom4j</artifactId>
+    				<version>2.1.1</version>
+				</dependency>
     </dependencies>
 
     <build>
@@ -261,16 +270,16 @@
                 </configuration>
             </plugin>
             <!--<plugin>-->
-            <!--<artifactId>maven-compiler-plugin</artifactId>-->
-            <!--<version>2.3.2</version>-->
-            <!--<configuration>-->
-            <!--<source>1.8</source>-->
-            <!--<target>1.8</target>-->
-            <!--<encoding>UTF-8</encoding>-->
-            <!--<compilerArguments>-->
-            <!--<extdirs>D:\D\Git\testPlatformLib</extdirs>&lt;!&ndash;指定外部lib&ndash;&gt;-->
-            <!--</compilerArguments>-->
-            <!--</configuration>-->
+                <!--<artifactId>maven-compiler-plugin</artifactId>-->
+                <!--<version>2.3.2</version>-->
+                <!--<configuration>-->
+                    <!--<source>1.8</source>-->
+                    <!--<target>1.8</target>-->
+                    <!--<encoding>UTF-8</encoding>-->
+                    <!--<compilerArguments>-->
+                        <!--<extdirs>D:\D\Git\testPlatformLib</extdirs>&lt;!&ndash;指定外部lib&ndash;&gt;-->
+                    <!--</compilerArguments>-->
+                <!--</configuration>-->
             <!--</plugin>-->
         </plugins>
     </build>

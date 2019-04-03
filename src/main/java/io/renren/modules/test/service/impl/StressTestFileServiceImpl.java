@@ -212,6 +212,8 @@ public class StressTestFileServiceImpl implements StressTestFileService {
             stressTestFile.setAddTime(new Date());
             update(stressTestFile);
         } else {
+        	// 保存文件，同时解决第一次保存文件时实体没有写入用例名称
+        	stressTestFile.setCaseName(stressCase.getCaseName());
             save(stressTestFile);
         }
         // 肯定存在已有的用例信息

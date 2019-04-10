@@ -89,6 +89,7 @@
 						<input type="radio" name="value" value="false" v-model="menu.value"/> false
 					</label>
 					<code v-if="menu.key == 'ThreadGroup.on_sample_error'">说明：该配置项备选值包括：(continue，startnextloop，stopthread，stoptest，stoptestnow)</code>
+					<code v-if="isNaN(menu.key) == false">以上所对应的值为 StartThreadsCount；InitialDelay(s)；StartupTime(s)；HoldLoadFor(s)；ShutdownTime</code>
 				</div>
 			</div>
 			

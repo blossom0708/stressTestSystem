@@ -225,7 +225,7 @@ $(function () {
     table.setCodeField("setId");
     table.setParentCodeField("parentId");
     table.setExpandAll(false);
-    table.setHeight("712px");
+    table.setHeight("660px");
     table.init();
     Menu.table = table;
 });

@@ -129,6 +129,14 @@ public class TestStressThreadSetServiceImpl implements TestStressThreadSetServic
 	 */
 	public void getNodes(Element node, Long fileId, String uuid, List<TestStressThreadSetEntity> tThreadSetEntityList) {
 		//System.out.println("--------------------");
+		if(node.getName().equals("TestPlan")){ //jmx脚本的测试计划属性值
+			List<Element> listElem = node.elements("boolProp"); 
+			String TestPlanValue = "";
+			for(Element TestPlanElem:listElem){
+				if(TestPlanElem.getTextTrim().equals("true")) TestPlanValue += TestPlanElem.attributeValue("name")+";";
+			}
+			tThreadSetEntityList.get(0).setValue(TestPlanValue.substring(0,TestPlanValue.length()-1));
+		}
 		TestStressThreadSetEntity stressThreadSetEntity = null;
 		//当前节点的名称、文本内容和属性
 		//System.out.println("当前节点名称："+node.getName());//当前节点名称
@@ -146,18 +154,10 @@ public class TestStressThreadSetServiceImpl implements TestStressThreadSetServic
 				+ "调度持续时间(s);调度启动延迟(s)";
 		String[] keyStr = keyValueStr.split(";");
 		String[] nameStr = namesStr.split(";");
-		for(Attribute attr:listAttr){//遍历当前节点的所有属性
+		attrfor: for(Attribute attr:listAttr){//遍历当前节点的所有属性
 			//String attrName=attr.getName();//属性名称
 			String keyName=attr.getValue();//属性的值
 			//System.out.println("属性名称："+name+"属性值："+value);
-			if(node.getName().equals("TestPlan")){ //jmx脚本的测试计划属性值
-				List<Element> listElem = node.elements("boolProp"); 
-				String TestPlanValue = "";
-				for(Element TestPlanElem:listElem){
-					if(TestPlanElem.getTextTrim().equals("true")) TestPlanValue += TestPlanElem.attributeValue("name")+";";
-				}
-				tThreadSetEntityList.get(0).setValue(TestPlanValue.substring(0,TestPlanValue.length()-1));
-			}
 			if(keyName.equals("ThreadGroup.on_sample_error")){ //jmx脚本的线程组属性值
 				uuid_p=UUID.randomUUID().toString().replaceAll("-", "");
 				stressThreadSetEntity = setSThreadSetEntity(
@@ -171,6 +171,29 @@ public class TestStressThreadSetServiceImpl implements TestStressThreadSetServic
 						fileId);
 				tThreadSetEntityList.add(stressThreadSetEntity);
 				System.out.println("---------线程组"+k+"-----------");
+				if(node.getParent().getName().endsWith("UltimateThreadGroup")){ //jp@gc - Ultimate Thread Group类别
+					//UltimateThreadGroup线程组太特殊，不适合循环逐个配置
+					List<Element> elistElem = node.getParent().elements().get(0).elements("collectionProp");
+					for(Element elem:elistElem){
+						String skeyName=elem.attributeValue("name");
+						String skeyValue="";
+						List<Element> slistElem = elem.elements("stringProp");
+						for(Element selem:slistElem){
+							skeyValue+=selem.getTextTrim()+";";
+						}
+						stressThreadSetEntity = setSThreadSetEntity(
+								UUID.randomUUID().toString().replaceAll("-", ""),
+								uuid_p,
+								skeyName,
+								skeyName,
+								skeyValue.substring(0,skeyValue.length() - 1),
+								2,
+								"配置项",
+								++k,
+								fileId);
+						tThreadSetEntityList.add(stressThreadSetEntity);
+					}
+				}
 			}
 			for (int i = 0 ; i <keyStr.length ; i++ ) { //jmx脚本的线程组具体配置项
 				if(keyName.equals(keyStr[i]) && !node.getName().equals("intProp") && !node.getParent().getName().equals("LoopController")){
@@ -186,6 +209,7 @@ public class TestStressThreadSetServiceImpl implements TestStressThreadSetServic
 							fileId);
 					tThreadSetEntityList.add(stressThreadSetEntity);
 					System.out.print(nameStr[i]+":"+keyName+"="+node.getTextTrim()+"\n");
+					break attrfor;
 				}
 			}
 		}
@@ -256,11 +280,15 @@ public class TestStressThreadSetServiceImpl implements TestStressThreadSetServic
 	 */
 	public void setNodes(Element node, List<TestStressThreadSetEntity> stressThreadSetEntityList) {
 		String attrNameValue = node.attributeValue("name");//获取属性名为name所对应的值
+		String attrParentValue = null;//获取父节点属性名为name所对应的值
+		if(node.getParent()!=null){
+			attrParentValue = node.getParent().attributeValue("name");
+		}
 		Entity : for (TestStressThreadSetEntity stressThreadSetEntity : stressThreadSetEntityList) {
     		//System.out.println(stressThreadSetEntity.getOrderNum()+"--------"+stressThreadSetEntity.getName());
     		if(stressThreadSetEntity.getType()==0){
-    			String[] testPlanValues = stressThreadSetEntity.getValue().split(";");
-    			Value : for(int i = 0 ; i < testPlanValues.length ; i++){
+    			String[] testPlanValues = stressThreadSetEntity.getValue().split(";|；");
+    			Values : for(int i = 0 ; i < testPlanValues.length ; i++){
     				if( attrNameValue != null && attrNameValue.equals(testPlanValues[i]) ){
     					node.setText("true");
     					if(i == testPlanValues.length-1){
@@ -268,6 +296,7 @@ public class TestStressThreadSetServiceImpl implements TestStressThreadSetServic
 							stressThreadSetEntityList.remove(stressThreadSetEntity);
 							break Entity;
 						}
+    					break Values;
     				}
     			}
     		}
@@ -277,10 +306,27 @@ public class TestStressThreadSetServiceImpl implements TestStressThreadSetServic
 				stressThreadSetEntityList.remove(stressThreadSetEntity);
     			break;
     		}else{
+    			if( attrParentValue != null && attrParentValue.equals(stressThreadSetEntity.getKey())){
+    				//jp@gc - Ultimate Thread Group的配置项值修改
+    				List<Element> listElem = node.getParent().elements("stringProp");
+    				String[] ultiThreadGroupValues = stressThreadSetEntity.getValue().split(";|；");
+        			ValueU : for(int i = 0 ; i < ultiThreadGroupValues.length ; i++){
+        				if(listElem.get(i).equals(node)){
+        					node.setText(ultiThreadGroupValues[i]);
+        					if(i == ultiThreadGroupValues.length-1){
+        						//修改完的配置项就移出循环，避免重复操作
+    							stressThreadSetEntityList.remove(stressThreadSetEntity);
+    							break Entity;
+    						}
+        					break ValueU;
+        				}
+        				
+        			}
+    			}
     			if( attrNameValue != null && attrNameValue.equals(stressThreadSetEntity.getKey()) &&
-						!node.getName().equals("intProp") && !node.getParent().getName().equals("LoopController") ){
+						!node.getName().matches("intProp|collectionProp") && !node.getParent().getName().equals("LoopController") ){
     				node.setText(stressThreadSetEntity.getValue());
-					//修改完的配置项就移出循环，避免重复操作
+					//普通配置项值修改，修改完的配置项就移出循环，避免重复操作
 					stressThreadSetEntityList.remove(stressThreadSetEntity);
     				break;
     			}

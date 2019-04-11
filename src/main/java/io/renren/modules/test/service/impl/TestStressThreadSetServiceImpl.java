@@ -184,7 +184,7 @@ public class TestStressThreadSetServiceImpl implements TestStressThreadSetServic
 						stressThreadSetEntity = setSThreadSetEntity(
 								UUID.randomUUID().toString().replaceAll("-", ""),
 								uuid_p,
-								skeyName,
+								"线程计划"+skeyName,
 								skeyName,
 								skeyValue.substring(0,skeyValue.length() - 1),
 								2,
@@ -196,7 +196,9 @@ public class TestStressThreadSetServiceImpl implements TestStressThreadSetServic
 				}
 			}
 			for (int i = 0 ; i <keyStr.length ; i++ ) { //jmx脚本的线程组具体配置项
-				if(keyName.equals(keyStr[i]) && !node.getName().equals("intProp") && !node.getParent().getName().equals("LoopController")){
+				if(keyName.equals(keyStr[i]) && !node.getParent().getName().equals("LoopController") && 
+						(!node.getName().equals("intProp") || (node.getName().equals("intProp") && 
+								node.getParent().getParent().getName().equals("ThreadGroup")))){
 					stressThreadSetEntity = setSThreadSetEntity(
 							UUID.randomUUID().toString().replaceAll("-", ""),
 							uuid_p,
@@ -324,8 +326,20 @@ public class TestStressThreadSetServiceImpl implements TestStressThreadSetServic
         			}
     			}
     			if( attrNameValue != null && attrNameValue.equals(stressThreadSetEntity.getKey()) &&
-						!node.getName().matches("intProp|collectionProp") && !node.getParent().getName().equals("LoopController") ){
-    				node.setText(stressThreadSetEntity.getValue());
+						!node.getName().equals("collectionProp") && !node.getParent().getName().equals("LoopController") ){
+    				String getValue=stressThreadSetEntity.getValue();
+    				String nodeName=node.getName();
+    				if(nodeName.equals("intProp") && !node.getParent().getParent().getName().equals("ThreadGroup")){
+    					//非ThreadGroup线程组的【循环次数】配置项都忽略不设置
+    					break;
+    				}
+    				if(nodeName.equals("intProp") && !getValue.equals("-1")){//ThreadGroup线程组的【循环次数】配置项
+    					node.setName("stringProp");
+    				}
+    				if(nodeName.equals("stringProp") && getValue.equals("-1")){//ThreadGroup线程组的【循环次数】配置项
+    					node.setName("intProp");
+    				}  				
+    				node.setText(getValue);
 					//普通配置项值修改，修改完的配置项就移出循环，避免重复操作
 					stressThreadSetEntityList.remove(stressThreadSetEntity);
     				break;

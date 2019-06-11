@@ -90,6 +90,7 @@ public class StressTestSlaveServiceImpl implements StressTestSlaveService {
         if (StressTestUtils.ENABLE.equals(status)) {
         	//启动前先检查进程，避免重复启动导致端口占用
             String psStr = ssh2Util.runCommand("ps -efww|grep -w 'jmeter-server'|grep -v grep|cut -c 9-15");
+            if(psStr.equals("")) throw new RRException(slave.getSlaveName() + " 节点机连接失败！");
             if(!psStr.equals("null")){
             	//本身已经是启用状态
             	if (StressTestUtils.ENABLE.equals(slave.getStatus())){
@@ -120,8 +121,14 @@ public class StressTestSlaveServiceImpl implements StressTestSlaveService {
         // 禁用节点
         if (StressTestUtils.DISABLE.equals(status)) {
             //禁用远程节点，当前是直接kill掉
-            //kill掉就不用判断结果了，不抛异常即OK
-            ssh2Util.runCommand("ps -efww|grep -w 'jmeter-server'|grep -v grep|cut -c 9-15|xargs kill -9");
+            //kill掉就不用判断结果了，不抛异常即OK，但需要判断是否连接失败
+            String psStr = ssh2Util.runCommand("ps -efww|grep -w 'jmeter-server'|grep -v grep|cut -c 9-15|xargs kill -9");
+            if(psStr.equals("")){
+                //如果连接失败，节点失效，状态直接更新为禁用（刷新页面才能看到）
+                slave.setStatus(status);
+                update(slave);
+                throw new RRException(slave.getSlaveName() + " 节点机连接失败！");
+            }
         }
     }
 

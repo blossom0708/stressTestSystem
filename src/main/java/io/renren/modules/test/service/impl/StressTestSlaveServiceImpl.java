@@ -128,7 +128,8 @@ public class StressTestSlaveServiceImpl implements StressTestSlaveService {
 
             logger.error(enableResult);
 
-            if (!enableResult.contains("remote")) {
+            if (!enableResult.contains("remote") && !enableResult.contains("Using local port")) {
+                //Using local port 表示固定本地端口（默认jmeter-server的本地端口是动态的）
                 throw new RRException(slave.getSlaveName() + " jmeter-server启动节点失败！请先尝试在节点机命令执行");
             }
         }

@@ -219,8 +219,8 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         // 肯定存在已有的用例信息
         stressTestDao.update(stressCase);
         stressTestUtils.saveFile(multipartFile, filePath);
-        // 对jmx脚本将线程组配置信息入库
-        if(filePath.substring(filePath.length()-3).equals("jmx")){
+        // 对jmx脚本将线程组配置信息入库(默认不入库)
+        if(stressTestUtils.isGetThreadGroup() && filePath.substring(filePath.length()-3).equals("jmx")){
         	try {
         		//入库前清理已有配置项
         		testStressThreadSetDao.deleteByFileId(stressTestFile.getFileId());

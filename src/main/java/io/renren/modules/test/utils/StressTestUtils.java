@@ -128,6 +128,11 @@ public class StressTestUtils {
      */
     public final static String MASTER_JMETER_REPLACE_FILE_KEY = "MASTER_JMETER_REPLACE_FILE_KEY";
 
+    /**
+     * 上传文件时，是否导入Jmeter脚本的线程组配置，默认是不导入false
+     */
+    public final static String JMETER_THREADGROUP_SET_KEY = "JMETER_THREADGROUP_SET_KEY";
+
     public static String getJmeterHome() {
     	return sysConfigService.getValue(MASTER_JMETER_HOME_KEY);
     }
@@ -146,6 +151,10 @@ public class StressTestUtils {
     
     public boolean isMasterGenerateReport() {
         return Boolean.valueOf(sysConfigService.getValue(MASTER_JMETER_GENERATE_REPORT_KEY));
+    }
+
+    public boolean isGetThreadGroup() {
+        return Boolean.valueOf(sysConfigService.getValue(JMETER_THREADGROUP_SET_KEY));
     }
 
     public static String getSuffix4() {

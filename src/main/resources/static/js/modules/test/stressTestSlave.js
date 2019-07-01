@@ -13,9 +13,13 @@ $(function () {
             {
                 label: '状态', name: 'status', width: 30, formatter: function (value, options, row) {
                 if (value === 0) {
-                    return '<span class="label label-danger">禁用</span>';
+                    return '<span class="label label-default">禁用</span>';
                 } else if (value === 1) {
                     return '<span class="label label-success">启用</span>';
+                } else if (value === 2) {
+                    return '<span class="label label-warning">进行中</span>';
+                } else if (value === 3) {
+                    return '<span class="label label-danger">异常</span>';
                 }
             }
             },
@@ -136,6 +140,12 @@ var vm = new Vue({
             });
         },
         batchUpdateStatus: function (value) {
+            var msgStr = "进行中...";
+            if (0 == value) {
+                msgStr = "正在禁用中...";
+            } else {
+                msgStr = "正在启用中...";
+            }
             var slaveIds = getSelectedRows();
             if (slaveIds == null) {
                 return;
@@ -149,7 +159,7 @@ var vm = new Vue({
                 data: {"slaveIds": slaveIds, "status": value},
                 success: function (r) {
                     if (r.code == 0) {
-                        alert('操作成功', function () {
+                        alert(msgStr, function () {
                             vm.reload();
                         });
                     } else {
@@ -172,7 +182,7 @@ var vm = new Vue({
                 data: {"slaveIds": slaveIds, "status": value},
                 success: function (r) {
                     if (r.code == 0) {
-                        alert('操作成功，请自行启动节点服务并确认端口连通！', function () {
+                        alert('启用成功，请自行启动节点服务并确认端口连通！', function () {
                             vm.reload();
                         });
                     } else {

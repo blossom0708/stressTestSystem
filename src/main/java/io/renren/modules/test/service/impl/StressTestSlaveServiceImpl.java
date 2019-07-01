@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class StressTestSlaveServiceImpl implements StressTestSlaveService {
     }
 
     /**
-     * 手工批量切换节点的状态（应用于无法远程连接节点的情况）
+     * 手工批量切换节点的状态（应用于无法远程连接节点的情况）：仅更新数据库字段
      */
     @Override
     public void updateBatchStatusForce(List<Long> slaveIds, Integer status) {
@@ -72,25 +73,33 @@ public class StressTestSlaveServiceImpl implements StressTestSlaveService {
     }
 
     /**
-     * 批量切换节点的状态
+     * 批量切换节点的状态：真正去执行Slave节点机启动脚本。
      */
     @Override
-    public void updateBatchStatus(List<Long> slaveIds, Integer status) {
+    @Async("asyncServiceExecutor")
+    public void updateBatchStatus(Long slaveId, Integer status) {
         //当前是向所有的分布式节点推送这个，阻塞操作+轮询，并非多线程，因为本地同步网卡会是瓶颈。
-        //使用for循环传统写法
         //采用了先给同一个节点机传送多个文件的方式，因为数据库的连接消耗优于节点机的链接消耗
-        for (Long slaveId : slaveIds) {
-            StressTestSlaveEntity slave = queryObject(slaveId);
-
-            // 跳过本机节点
-            if (!"127.0.0.1".equals(slave.getIp().trim())) {
-                runOrDownSlave(slave, status);
-            }
-
-            //更新数据库
-            slave.setStatus(status);
+        StressTestSlaveEntity slave = queryObject(slaveId);
+        // 跳过本机节点
+        if (!"127.0.0.1".equals(slave.getIp().trim())) {
+            //更新数据库为进行中
+            slave.setStatus(StressTestUtils.PROGRESSING);
             update(slave);
+
+            try {
+                runOrDownSlave(slave, status);
+            } catch (RRException e) {
+                //更新为异常状态（这是异步更新需要）
+                slave.setStatus(StressTestUtils.RUN_ERROR);
+                update(slave);
+                throw e;
+            }
         }
+
+        //更新数据库
+        slave.setStatus(status);
+        update(slave);
     }
 
     /**
@@ -106,25 +115,27 @@ public class StressTestSlaveServiceImpl implements StressTestSlaveService {
             String psStr = ssh2Util.runCommand("ps -efww|grep -w 'jmeter-server'|grep -v grep|cut -c 9-15");
             if(psStr.equals("")) throw new RRException(slave.getSlaveName() + " 节点机连接失败！");
             if(!psStr.equals("null")){
-            	//本身已经是启用状态
+                //本身已经是启用状态，由进行中更新为启动状态（这是异步更新需要）
+                slave.setStatus(StressTestUtils.ENABLE);
+                update(slave);
             	if (StressTestUtils.ENABLE.equals(slave.getStatus())){
-            		throw new RRException(slave.getSlaveName() + " 已经启动不要重复启动！");
+                    logger.error(slave.getSlaveName() + " 已经启动不要重复启动！-----------------------------");
             	} else {
-            		throw new RRException(slave.getSlaveName() + " 节点机进程已存在，请先校准！");
+                    logger.error(slave.getSlaveName() + " 节点机进程已存在，请先校准！-----------------------");
             	}
             }
         	// 避免跨系统的问题，远端由于都时linux服务器，则文件分隔符统一为/，不然同步文件会报错。
             String jmeterServer = slave.getHomeDir() + "/bin/jmeter-server";
             String md5Str = ssh2Util.runCommand("md5sum " + jmeterServer + " | cut -d ' ' -f1");
             if (!checkMD5(md5Str)) {
-                throw new RRException(slave.getSlaveName() + " 节点路径错误！找不到jmeter-server启动文件！");
+                throw new RRException(slave.getSlaveName() + " 执行遇到问题！找不到jmeter-server启动文件！");
             }
             //首先创建目录，会遇到重复创建
             ssh2Util.runCommand("mkdir " + slave.getHomeDir() + "/bin/stressTestCases");
             //启动节点
             String enableResult = ssh2Util.runCommand(
                     "cd " + slave.getHomeDir() + "/bin/stressTestCases/" + "\n" +
-                    "sh " + "../jmeter-server -Djava.rmi.server.hostname=" + slave.getIp());
+                            "sh " + "../jmeter-server -Djava.rmi.server.hostname=" + slave.getIp());
 
             logger.error(enableResult);
 

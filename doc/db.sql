@@ -192,7 +192,7 @@ CREATE TABLE `schedule_job_log` (
 
 
 
-INSERT INTO `schedule_job` (`bean_name`, `method_name`, `params`, `cron_expression`, `status`, `remark`, `create_time`) VALUES ('testTask', 'test', 'renren', '0 0/30 * * * ?', '0', '有参数测试', '2016-12-01 23:16:46');
+INSERT INTO `schedule_job` (`bean_name`, `method_name`, `params`, `cron_expression`, `status`, `remark`, `create_time`) VALUES ('testTask', 'test', 'renren', '0 0/30 * * * ?', '1', '有参数测试', '2016-12-01 23:16:46');
 INSERT INTO `schedule_job` (`bean_name`, `method_name`, `params`, `cron_expression`, `status`, `remark`, `create_time`) VALUES ('testTask', 'test2', NULL, '0 0/30 * * * ?', '1', '无参数测试', '2016-12-03 14:55:56');
 
 
@@ -456,7 +456,7 @@ INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('6',
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('7', 'JMETER_THREADGROUP_SET_KEY', 'false', '1', 'true：开启线程组管理功能，上传脚本时线程组配置将入库管理，默认false。');
 
 -- Grafana监控视图
-INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('36', '31', 'Grafana监控视图', 'modules/test/stressTestAssembly.html', 'test:stress', '1', 'fa fa-clipboard', '5');
+INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('36', '31', 'Grafana监控视图', 'http://127.0.0.1:3000', NULL, '1', 'fa fa-clipboard', '5');
 
 -- 修改test_stress_case_file表(smooth 20181205)
 ALTER TABLE `test_stress_case_file` CHANGE `weblog_status` `debug_status` tinyint NOT NULL DEFAULT 0;

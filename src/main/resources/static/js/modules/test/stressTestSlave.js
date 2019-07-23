@@ -27,7 +27,7 @@ $(function () {
             {label: '权重', name: 'weight', width: 30, sortable: false}
         ],
         viewrecords: true,
-        height: 385,
+        height: $(window).height() - 150,
         rowNum: 50,
         rowList: [10, 30, 50, 100, 200],
         rownumbers: true,
@@ -183,6 +183,29 @@ var vm = new Vue({
                 success: function (r) {
                     if (r.code == 0) {
                         alert('启用成功，请自行启动节点服务并确认端口连通！', function () {
+                            vm.reload();
+                        });
+                    } else {
+                        alert(r.msg);
+                    }
+                }
+            });
+        },
+        batchRestart: function () {
+            var slaveIds = getSelectedRows();
+            if (slaveIds == null) {
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: baseURL + "test/stressSlave/batchRestart",
+                // contentType: "application/json",
+                // data: JSON.stringify(postData),
+                data: {"slaveIds": slaveIds},
+                success: function (r) {
+                    if (r.code == 0) {
+                        alert('开始执行', function () {
                             vm.reload();
                         });
                     } else {

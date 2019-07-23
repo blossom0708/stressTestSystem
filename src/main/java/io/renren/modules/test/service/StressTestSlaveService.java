@@ -52,6 +52,11 @@ public interface StressTestSlaveService {
 	void updateBatchStatusForce(List<Long> slaveIds, Integer status);
 
 	/**
+	 * 重启节点
+	 */
+	void restartSingle(Long slaveId);
+
+	/**
 	 * 根据后台节点进程状态，批量刷新节点状态
 	 */
 	void batchReloadStatus();

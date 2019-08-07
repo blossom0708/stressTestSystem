@@ -135,7 +135,10 @@ public class TestStressThreadSetServiceImpl implements TestStressThreadSetServic
 			for(Element TestPlanElem:listElem){
 				if(TestPlanElem.getTextTrim().equals("true")) TestPlanValue += TestPlanElem.attributeValue("name")+";";
 			}
-			tThreadSetEntityList.get(0).setValue(TestPlanValue.substring(0,TestPlanValue.length()-1));
+			//add by wuxc 如果没有boolProp属性为true,则Value放空，否则上传脚本无法成功。
+			if(TestPlanValue.length()>0) {
+				tThreadSetEntityList.get(0).setValue(TestPlanValue.substring(0,TestPlanValue.length()-1));
+			}
 		}
 		TestStressThreadSetEntity stressThreadSetEntity = null;
 		//当前节点的名称、文本内容和属性

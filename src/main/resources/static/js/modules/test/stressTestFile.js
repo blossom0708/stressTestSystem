@@ -5,7 +5,17 @@ $(function () {
         colModel: [
             {label: '文件ID', name: 'fileId', width: 30, key: true},
             // {label: '用例ID', name: 'caseId', width: 35},
-            {label: '用例名称', name: 'caseName', width: 35, sortable: false},
+            {label: '用例名称', name: 'caseName', width: 35, sortable: false,
+                formatter: function (value, options, row) {
+                    if (!(getExtension(row.originName) && /^(jmx)$/.test(getExtension(row.originName).toLowerCase()))) {
+                        return value;
+                    }
+                    if (row.debugStatus == 1)
+                        return "<a href='/modules/test/debugTestReports.html?CaseID=" + row.caseId + "' title='"+value+" 调试报告'>" + value + "</a>";
+                    else
+                        return "<a href='/modules/test/stressTestReports.html?CaseID=" + row.caseId + "' title='"+value+" 测试报告'>" + value + "</a>";
+                }
+            },
             {
                 label: '文件名称',
                 name: 'originName',
@@ -16,7 +26,7 @@ $(function () {
                         return value;
                     }
                     return "<a href='javascript:void(0);' onclick='" +
-                        "ShowRunning(" + row.fileId + ")'>" + value + "</a>";
+                        "ShowRunning(" + row.fileId + ")' title='" + value + " 压测监控'>" + value + "</a>";
                 }
             },
             {label: '添加时间', name: 'addTime', width: 70},
@@ -136,13 +146,25 @@ var vm = new Vue({
     el: '#rrapp',
     data: {
         q: {
-            caseId: null
+            caseId: getQueryString('CaseID')
         },
         stressTestFile: {},
         title: null,
         showChart: false,
         showList: true,
         showEdit: false
+    },
+    mounted() {
+        if (this.q.caseId) {
+            // 如果caseId不为空，说明是从用例页面传入CaseId
+            this.$nextTick(() => {
+                // 加上延时避免 mounted 方法比页面加载早执行
+                setTimeout(() => {
+                //this.$refs.queryResult.click()
+                this.query()
+            }, 100)
+        })
+        }
     },
     methods: {
         query: function () {
@@ -341,6 +363,14 @@ function synchronizeFile(fileIds) {
             }
         });
     });
+}
+
+function getQueryString (name) {
+    // 获取用例页面传过来的CaseId
+    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if(r!=null) return  decodeURI(r[2]);
+    return null;
 }
 
 var timeTicket;

@@ -4,7 +4,11 @@ $(function () {
         datatype: "json",
         colModel: [
             {label: '用例ID', name: 'caseId', width: 50, key: true},
-            {label: '名称', name: 'caseName', sortable: false, width: 150},
+            {label: '名称', name: 'caseName', sortable: false, width: 150,
+                formatter: function (value, options, row) {
+                    return "<a href='/modules/test/stressTestFile.html?CaseID=" + row.caseId + "'>" + value + "</a>";
+                }
+            },
             {label: '添加时间', name: 'addTime', width: 90},
             {label: '项目', name: 'project', sortable: false, width: 80},
             {label: '模块', name: 'module', sortable: false, width: 80},

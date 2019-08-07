@@ -76,11 +76,23 @@ var vm = new Vue({
     el: '#rrapp',
     data: {
         q: {
-            caseId: null
+            caseId: getQueryString('CaseID')
         },
         debugCaseReport: {},
         title: null,
         showList: true
+    },
+    mounted() {
+        if (this.q.caseId) {
+            // 如果caseId不为空，说明是从用例页面传入CaseId
+            this.$nextTick(() => {
+                // 加上延时避免 mounted 方法比页面加载早执行
+                setTimeout(() => {
+                    //this.$refs.queryResult.click()
+                    this.query()
+                }, 100)
+            })
+        }
     },
     methods: {
         query: function () {
@@ -230,4 +242,12 @@ function checkStatus(status) {
         return false;
     }
     return true;
+}
+
+function getQueryString (name) {
+    // 获取脚本文件管理页面传过来的CaseId
+    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if(r!=null) return  decodeURI(r[2]);
+    return null;
 }

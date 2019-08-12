@@ -392,10 +392,15 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         // slaveStr用来做脚本是否是分布式执行的判断，不入库。
         stressTestFile.setSlaveStr(slaveStr);
 
-        if (stressTestUtils.isUseJmeterScript()) {
-            excuteJmeterRunByScript(stressTestFile, stressTestReports, map);
-        } else {
-            excuteJmeterRunLocal(stressTestFile, stressTestReports, map);
+        try {
+            if (stressTestUtils.isUseJmeterScript()) {
+                excuteJmeterRunByScript(stressTestFile, stressTestReports, map);
+            } else {
+                excuteJmeterRunLocal(stressTestFile, stressTestReports, map);
+            }
+        }catch(RRException e) {
+            // 解决BUG：分布式情况下禁止调试，却无法在前端提示。修复后会提示用户“请关闭调试模式！”
+            return e.getMsg();
         }
 
         //保存文件的执行状态，用于前台提示及后端查看排序。
@@ -430,7 +435,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         // 所以调试模式下如果运行脚本则无法生成测试报告，造成系统功能缺失。
         // 为避免后续问题，jmx如果使用了调试，则无法使用脚本方式运行。
         if (StressTestUtils.NEED_DEBUG.equals(stressTestFile.getDebugStatus())) {
-            throw new RRException("请禁用调试模式！");
+            throw new RRException("不支持在分布式slave节点调试，请关闭调试模式！");
         }
     	
     	String jmeterHomeBin = stressTestUtils.getJmeterHomeBin();
@@ -496,7 +501,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
             stressTestUtils.setJmeterProperties();
             if (StressTestUtils.NEED_DEBUG.equals(stressTestFile.getDebugStatus())) {
                 if (StringUtils.isNotEmpty(slaveStr)) {//分布式的方式启动
-                    throw new RRException("不支持分布式slave节点的调试！请关闭slave节点再试一试！");
+                    throw new RRException("不支持在分布式slave节点调试，请关闭调试模式！");
                 }
                 stressTestUtils.setJmeterOutputFormat();
             }

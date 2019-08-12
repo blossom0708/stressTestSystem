@@ -1,4 +1,7 @@
 $(function () {
+    $("#cron").cronGen({
+        direction : 'right'
+    });
     $("#jqGrid").jqGrid({
         url: baseURL + 'test/stressFile/list',
         datatype: "json",
@@ -152,7 +155,10 @@ var vm = new Vue({
         title: null,
         showChart: false,
         showList: true,
-        showEdit: false
+        showEdit: false,
+        showTask: false,
+        showCronManual: false,
+        showCronGenerate: false
     },
     mounted() {
         if (this.q.caseId) {
@@ -182,6 +188,7 @@ var vm = new Vue({
             vm.showList = false;
             vm.showChart = false;
             vm.showEdit = true;
+            vm.showTask = false;
             vm.title = "配置";
             if (fileIds.length > 1) {
                 vm.stressTestFile.reportStatus = 0;
@@ -282,6 +289,7 @@ var vm = new Vue({
             vm.showChart = false;
             vm.showList = true;
             vm.showEdit = false;
+            vm.showTask = false;
             var page = $("#jqGrid").jqGrid('getGridParam', 'page');
             $("#jqGrid").jqGrid('setGridParam', {
                 postData: {'caseId': vm.q.caseId},
@@ -289,6 +297,27 @@ var vm = new Vue({
             }).trigger("reloadGrid");
             // clearInterval 是自带的函数。
             clearInterval(timeTicket);
+        },
+        validator: function () {
+            if(isBlank(vm.stressTestFile.params)){
+                alert("参数不能为空");
+                return true;
+            }
+
+            var cronExpression = vm.stressTestFile.cronExpression;
+            if(isBlank(cronExpression)){
+                alert("cron表达式不能为空");
+                return true;
+            }
+
+            //正则表达式判断不了过多指定时间的情况，只能把过多指定时间替换/(,(\S*),)/成两个指定时间
+            var repCronExpression = cronExpression.replace(/(,[\d,]+,)/,',').
+            replace(/(,[\d,]+,)/,',').replace(/(,[\d,]+,)/,',').
+            replace(/(,[\d,]+,)/,',').replace(/(,[\d,]+,)/,',');
+            if(!isCron(repCronExpression)){
+                alert("cron格式不支持，请检查，并注意不要指定周和年时间！");
+                return true;
+            }
         },
         suspendEcharts: function (event) {
             clearInterval(timeTicket);
@@ -298,6 +327,76 @@ var vm = new Vue({
         },
         clearEcharts: function (event) {
             clearEcharts();
+        },
+        addTask: function(){
+            var fileIds = getSelectedRows();
+            if (fileIds == null) {
+                return;
+            } else {
+                for(var i in fileIds){
+                    $.get(baseURL + "test/stressFile/info/" + fileIds[i], function (r) {
+                        if (!(getExtension(r.stressTestFile.originName) &&
+                            /^(jmx)$/.test(getExtension(r.stressTestFile.originName).toLowerCase()))) {
+                            alert(r.stressTestFile.originName + '非测试脚本，禁止加为任务！');
+                            vm.reload();
+                        } else {
+                            if(1 == r.stressTestFile.status){
+                                alert(r.stressTestFile.originName + '正在运行，禁止加为任务！');
+                                vm.reload();
+                            }
+                        }
+                    });
+                }
+            }
+            vm.showList = false;
+            vm.showTask = true;
+            vm.showCronManual = true;
+            vm.showCronGenerate = false;
+            vm.title = "添加任务";
+            vm.stressTestFile = {beanName: 'stressTestTask', methodName: 'stressTest', params: fileIds.toString(), cronEditType: 0};
+        },
+        chkCronEditType: function () {
+            if(1 == vm.stressTestFile.cronEditType){
+                vm.showCronManual = false;
+                vm.showCronGenerate = true;
+            }else{
+                vm.showCronManual = true;
+                vm.showCronGenerate = false;
+            }
+        },
+        queryTask: function () {
+            window.location.href = "/modules/job/schedule.html?BeanName=stressTestTask";
+        },
+        saveTask: function () {
+            if(1 == vm.stressTestFile.cronEditType){
+                vm.stressTestFile.cronExpression = $("#cron").val();
+            }
+            if(vm.validator()){
+                return ;
+            }
+            var schedule = {
+                beanName: vm.stressTestFile.beanName,
+                methodName: vm.stressTestFile.methodName,
+                params: vm.stressTestFile.params,
+                cronExpression: vm.stressTestFile.cronExpression,
+                remark: vm.stressTestFile.remark
+            };
+            var url = "sys/schedule/save";
+            $.ajax({
+                type: "POST",
+                url: baseURL + url,
+                contentType: "application/json",
+                data: JSON.stringify(schedule),
+                success: function(r){
+                    if(r.code === 0){
+                        alert('操作成功', function(){
+                            vm.reload();
+                        });
+                    }else{
+                        alert(r.msg);
+                    }
+                }
+            });
         }
     }
 });

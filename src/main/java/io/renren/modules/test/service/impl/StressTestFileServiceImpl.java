@@ -342,6 +342,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
      * 脚本的启动都是新的线程，其中的SQL是不和启动是同一个事务的。
      * 同理，也不会回滚这一事务。
      */
+    @Override
     public String runSingle(Long fileId) {
         StressTestFileEntity stressTestFile = queryObject(fileId);
         if (StressTestUtils.RUNNING.equals(stressTestFile.getStatus())) {
@@ -670,6 +671,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
      * 脚本的启动都是新的线程，其中的SQL是不和启动是同一个事务的。
      * 同理，也不会回滚这一事务。
      */
+    @Override
     public void stopSingle(Long fileId) {
         if (stressTestUtils.isUseJmeterScript()) {
             throw new RRException("Jmeter脚本启动不支持单独停止，请使用全部停止！");

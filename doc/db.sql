@@ -3,7 +3,7 @@ CREATE TABLE `sys_menu` (
   `menu_id` bigint NOT NULL AUTO_INCREMENT,
   `parent_id` bigint COMMENT '父菜单ID，一级菜单为0',
   `name` varchar(50) COMMENT '菜单名称',
-  `url` varchar(200) COMMENT '菜单URL',
+  `url` varchar(300) COMMENT '菜单URL',
   `perms` varchar(500) COMMENT '授权(多个用逗号分隔，如：user:list,user:create)',
   `type` int COMMENT '类型   0：目录   1：菜单   2：按钮',
   `icon` varchar(50) COMMENT '菜单图标',
@@ -482,7 +482,7 @@ CREATE TABLE `test_debug_case_reports` (
 -- 修改菜单，添加调试报告管理界面（smooth 20181205）
 update `sys_menu` set `menu_id`='37',`order_num`='6' where `menu_id`='36';
 update `sys_menu` set `menu_id`='36',`order_num`='5' where `menu_id`='35';
-INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('37', '31', '调试报告管理', 'modules/test/debugTestReports.html', 'test:debug', '1', 'fa fa-area-chart', '4');
+INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('35', '31', '调试报告管理', 'modules/test/debugTestReports.html', 'test:debug', '1', 'fa fa-area-chart', '4');
 
 -- 添加线程组管理界面（smooth 20190402）
 -- 脚本线程组管理

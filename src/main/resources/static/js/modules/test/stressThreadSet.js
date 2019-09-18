@@ -159,7 +159,7 @@ Menu.initColumn = function () {
         {title: '上级配置', field: 'parentName', align: 'center', valign: 'middle', sortable: true, width: '100px'},
         {title: '配置项', field: 'key', align: 'center', valign: 'middle', sortable: true, width: '220px'},
         {title: '配置值', field: 'value', align: 'center', valign: 'middle', sortable: true, width: '100px'},
-        {title: '类型', field: 'type', align: 'center', valign: 'middle', sortable: true, width: '100px', formatter: function(item, index){
+        {title: '类型', field: 'type', align: 'center', valign: 'middle', sortable: true, width: '70px', formatter: function(item, index){
         	if(item.type === 0){
                 return '<span class="label label-primary">脚本</span>';
             }
@@ -171,8 +171,6 @@ Menu.initColumn = function () {
             }
         }},
         {title: '配置说明', field: 'explain', align: 'center', valign: 'middle', sortable: true},
-        {title: '配置号', field: 'orderNum', align: 'center', valign: 'middle', sortable: true, width: '80px'},
-        {title: '脚本ID', field: 'fileId', align: 'center', valign: 'middle', sortable: true, width: '80px'},
         {title: '执行操作', align: 'center', valign: 'middle', sortable: true, width: '120px', formatter: function(item, index){
         	if(item.type === 0){
         		var btn = '';

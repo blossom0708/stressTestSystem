@@ -77,6 +77,11 @@ public class StressTestFileEntity implements Serializable {
     private Integer debugStatus;
 
     /**
+     * 脚本最长定时执行多少秒，默认是4小时
+     */
+    private Integer duration = 14400;
+
+    /**
      * 提交的用户
      */
     private String addBy;
@@ -235,6 +240,14 @@ public class StressTestFileEntity implements Serializable {
 
     public void setFileIdList(Long[] fileIdList) {
         this.fileIdList = fileIdList;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
     }
 
     /**

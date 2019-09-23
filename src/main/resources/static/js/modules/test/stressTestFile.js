@@ -70,7 +70,7 @@ $(function () {
             {
             	label: '调试',
                 name: 'debugStatus',
-                width: 40,
+                width: 30,
                 sortable: false,
                 formatter: function (value, options, row) {
                     if (!(getExtension(row.originName) && /^(jmx)$/.test(getExtension(row.originName).toLowerCase()))) {
@@ -84,7 +84,7 @@ $(function () {
                 }
             },
             {
-                label: '状态', name: 'status', width: 45, formatter: function (value, options, row) {
+                label: '状态', name: 'status', width: 40, formatter: function (value, options, row) {
                     if (value === 0) {
                         return '<span class="label label-info">创建成功</span>';
                     } else if (value === 1) {
@@ -100,7 +100,7 @@ $(function () {
                 }
             },
             {
-            	label: '执行操作', name: '', width: 95, sortable: false, formatter: function (value, options, row) {
+            	label: '执行操作', name: '', width: 100, sortable: false, formatter: function (value, options, row) {
                     var btn = '';
                     if (!(getExtension(row.originName) && /^(jmx)$/.test(getExtension(row.originName).toLowerCase()))) {
                         btn = "<a href='#' class='btn btn-primary' onclick='synchronizeFile(" + row.fileId + ")' ><i class='fa fa-arrow-circle-right'></i>&nbsp;同步文件</a>";
@@ -194,12 +194,17 @@ var vm = new Vue({
                 vm.stressTestFile.reportStatus = 0;
                 vm.stressTestFile.webchartStatus = 0;
                 vm.stressTestFile.debugStatus = 0;
-                // vm.stressTestFile.originName = null;
+                vm.stressTestFile.duration = 14400;
                 vm.stressTestFile.fileIdList = fileIds;
             } else {
                 var fileId = fileIds[0];
                 $.get(baseURL + "test/stressFile/info/" + fileId, function (r) {
-                    vm.stressTestFile = r.stressTestFile;
+                    if(/^(jmx)$/.test(getExtension(r.stressTestFile.originName).toLowerCase())) {
+                        vm.stressTestFile = r.stressTestFile;
+                    } else {
+                        alert(r.stressTestFile.originName + " 不是脚本，请重新选择！");
+                        vm.reload();
+                    }
                 });
             }
         },

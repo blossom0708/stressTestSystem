@@ -397,7 +397,8 @@ CREATE TABLE `test_stress_case_file` (
   `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态  0：初始状态  1：正在运行  2：成功执行  3：运行出现异常   -1：不被搜索出来',
   `report_status` tinyint NOT NULL DEFAULT 0 COMMENT '状态  0：保存测试报告原始文件  1：不需要测试报告',
   `webchart_status` tinyint NOT NULL DEFAULT 0 COMMENT '状态  0：需要前端监控  1：不需要前端监控',
-  `weblog_status` tinyint NOT NULL DEFAULT 0 COMMENT '状态  0：不需要前端显示日志  1：前端仅显示错误日志   2：前端仅显示正确日志   3：前端正确错误日志都显示',
+  `debug_status` tinyint NOT NULL DEFAULT 0 COMMENT '状态  0：关闭debug  1：开始debug调试模式',
+  `duration` int NOT NULL DEFAULT 14400 COMMENT '期间，执行时间，单位秒，脚本执行多久停止，0代表永远执行',
   `add_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `add_by` bigint(20) COMMENT '提交用户id',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
@@ -454,13 +455,10 @@ INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('4',
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('5', 'MASTER_JMETER_REPLACE_FILE_KEY', 'true', '1', '上传文件时，遇到同名文件是替换还是报错，默认是替换为true');
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('6', 'MASTER_JMETER_GENERATE_REPORT_KEY', 'true', '1', 'true:本地web程序进程生成测试报告，可以多线程并发生成。false:使用Jmeter_home中的命令生成测试报告。');
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('7', 'JMETER_THREADGROUP_SET_KEY', 'false', '1', 'true：开启线程组管理功能，上传脚本时线程组配置将入库管理，默认false。');
+INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('8', 'SCRIPT_SCHEDULER_DURATION_KEY', 'true', '1', 'true:脚本限时执行生效，具体时间由脚本单独配置，是默认值 false:取消脚本限时执行');
 
 -- Grafana监控视图
 INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('36', '31', 'Grafana监控视图', 'http://127.0.0.1:3000', NULL, '1', 'fa fa-clipboard', '5');
-
--- 修改test_stress_case_file表(smooth 20181205)
-ALTER TABLE `test_stress_case_file` CHANGE `weblog_status` `debug_status` tinyint NOT NULL DEFAULT 0;
-ALTER TABLE `test_stress_case_file` MODIFY column `debug_status` tinyint  NOT NULL DEFAULT 0 comment '状态  0：关闭debug  1：开始debug调试模式';
 
 -- 调试/接口测试报告文件表(smooth 20181205)
 CREATE TABLE `test_debug_case_reports` (

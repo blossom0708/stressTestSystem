@@ -1,9 +1,7 @@
 **项目说明** 
-- 本项目基于renren-fast Java开发平台开发，内核基于Jmeter-Api和Jmeter脚本实现在线性能压测。
+- 本项目基于renren-fast Java开发平台开发，内核基于Jmeter-Api和Jmeter脚本实现在线性能压测。是基于zyanycall/stressTestPlatform的开源项目做了大量的改造。
 <br> 
  
-
-
 **具有如下特点** 
 - 友好的代码结构及注释，便于阅读及二次开发
 - 实现前后端分离，通过token进行数据交互，前端再也不用关注后端技术
@@ -49,7 +47,6 @@ renren-fast
 
 ```
 
-
 **技术选型：** 
 - 核心框架：Spring Boot 1.5
 - 安全框架：Apache Shiro 1.3
@@ -60,7 +57,7 @@ renren-fast
 - 日志管理：SLF4J 1.7、Log4j
 - 页面交互：Vue2.x 
 - 前端监控：ECharts 3.8
-- 压测内核：Apache JMeter 4.0
+- 压测内核：Apache JMeter 5.1.1
 - 脚本调用内核：Apache Commons Exec 1.3
 - 远程执行命令：Ganymed build210
 - 批量上传组件：bootstrap-fileinput v4.5.2
@@ -73,9 +70,9 @@ renren-fast
 - 修改application-dev.yml，更新MySQL账号和密码
 - 修改MySQL中sys_config表中Jmeter专属配置项，更新为本地地址
 - Eclipse、IDEA运行RenrenApplication.java，则可启动项目
-- 项目访问路径：http://localhost:8080/renren-fast
+- 项目访问路径：http://localhost:8080
 - 账号密码：admin/admin
-- Swagger路径：http://localhost:8080/renren-fast/swagger/index.html
+- Swagger路径：http://localhost:8080/swagger/index.html
 
 **jar部署**
 - 修改application.yml，修改profiles，指定执行环境如线下环境pro
@@ -83,7 +80,7 @@ renren-fast
 - 通过maven命令打包jar包：mvn clean package -f pom.xml
 - 将target目录下，打包好的jar包通过java -jar renren-fast.jar 调用
 - 也可以将打好的jar包通过Dockerfile build到Docker镜像中
-- 项目访问路径，如：http://线下环境ip:8080/renren-fast
+- 项目访问路径，如：http://线下环境ip:8080
 - 账号密码：admin/admin
 
  **tomcat部署**
@@ -92,6 +89,6 @@ renren-fast
 - 通过maven命令打包war包：mvn clean package -f pom-war.xml
 - 将target目录下，打包好的war包保存到tomcat的webapps目录下
 - 通过tomcat的bin目录下的startup命令，启动tomcat
-- 访问tomcat路径，如：http://线下环境ip:8080/renren-fast
+- 访问tomcat路径，如：http://线下环境ip:8080
 - 账号密码：admin/admin
 <br> 

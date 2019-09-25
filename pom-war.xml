@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.renren</groupId>
-    <artifactId>renren-fast</artifactId>
+    <artifactId>ROOT</artifactId>
     <version>1.0.0</version>
     <packaging>war</packaging>
     <description>war包对应的pom，打war包，执行【mvn clean package -f pom-war.xml】</description>
@@ -34,7 +34,8 @@
         <aliyun.oss.version>2.5.0</aliyun.oss.version>
         <qcloud.cos.version>4.4</qcloud.cos.version>
         <swagger.version>2.2.2</swagger.version>
-        <jmeter.version>4.0</jmeter.version>
+        <jmeter.version>5.1.1</jmeter.version>
+        <jmeter.plugins.version>1.4.0</jmeter.plugins.version>
         <jmeter.websocket.version>1.2.2</jmeter.websocket.version>
         <jetty.version>9.4.12.RC2</jetty.version>
     </properties>
@@ -247,6 +248,17 @@
             <groupId>org.dom4j</groupId>
             <artifactId>dom4j</artifactId>
             <version>2.1.1</version>
+        </dependency>
+        <!-- kg.apc.jmeter.plugins（热门的jmeter扩展插件） -->
+        <dependency>
+            <groupId>kg.apc</groupId>
+            <artifactId>jmeter-plugins-extras-libs</artifactId>
+            <version>${jmeter.plugins.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>kg.apc</groupId>
+            <artifactId>jmeter-plugins-standard</artifactId>
+            <version>${jmeter.plugins.version}</version>
         </dependency>
         <!-- 以下为第三方插件依赖包（以支持Websocket接口测试） -->
         <dependency>

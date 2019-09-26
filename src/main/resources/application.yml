@@ -6,12 +6,12 @@ server:
         min-spare-threads: 30
     port: 8080
     connection-timeout: 5000
-    context-path: /
+    context-path: /renren-fast
 
 spring:
     # 环境 dev|test|pro|系统默认使用dev
     profiles:
-        active: test
+        active: dev
     # jackson时间格式化
     jackson:
         time-zone: GMT+8

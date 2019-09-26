@@ -1,5 +1,5 @@
 **项目说明** 
-- 本项目基于renren-fast Java开发平台开发，内核基于Jmeter-Api和Jmeter脚本实现在线性能压测。是基于zyanycall/stressTestPlatform的开源项目做了大量的改造。
+- 本项目基于renren-fast Java开发平台开发，内核基于Jmeter-Api和Jmeter脚本实现在线性能压测。是在zyanycall/stressTestPlatform的开源项目基础上做了大量的改造，后续还会继续追加新功能。
 <br> 
  
 **具有如下特点** 
@@ -70,9 +70,9 @@ renren-fast
 - 修改application-dev.yml，更新MySQL账号和密码
 - 修改MySQL中sys_config表中Jmeter专属配置项，更新为本地地址
 - Eclipse、IDEA运行RenrenApplication.java，则可启动项目
-- 项目访问路径：http://localhost:8080
+- 项目访问路径：http://localhost:8080/renren-fast
 - 账号密码：admin/admin
-- Swagger路径：http://localhost:8080/swagger/index.html
+- Swagger路径：http://localhost:8080/renren-fast/swagger/index.html
 
 **jar部署**
 - 修改application.yml，修改profiles，指定执行环境如线下环境pro
@@ -80,7 +80,7 @@ renren-fast
 - 通过maven命令打包jar包：mvn clean package -f pom.xml
 - 将target目录下，打包好的jar包通过java -jar renren-fast.jar 调用
 - 也可以将打好的jar包通过Dockerfile build到Docker镜像中
-- 项目访问路径，如：http://线下环境ip:8080
+- 项目访问路径，如：http://线下环境ip:8080/renren-fast
 - 账号密码：admin/admin
 
  **tomcat部署**

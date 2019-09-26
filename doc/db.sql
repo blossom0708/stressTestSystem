@@ -1,3 +1,4 @@
+-- sql是全量创建数据库脚本，不是增量更新脚本，迭代更新的请自行对照好表结构，避免遗漏更新
 -- 菜单
 CREATE TABLE `sys_menu` (
   `menu_id` bigint NOT NULL AUTO_INCREMENT,
@@ -123,7 +124,6 @@ CREATE TABLE `sys_oss` (
 
 INSERT INTO `sys_config` (`key`, `value`, `status`, `remark`) VALUES ('CLOUD_STORAGE_CONFIG_KEY', '{\"aliyunAccessKeyId\":\"\",\"aliyunAccessKeySecret\":\"\",\"aliyunBucketName\":\"\",\"aliyunDomain\":\"\",\"aliyunEndPoint\":\"\",\"aliyunPrefix\":\"\",\"qcloudBucketName\":\"\",\"qcloudDomain\":\"\",\"qcloudPrefix\":\"\",\"qcloudSecretId\":\"\",\"qcloudSecretKey\":\"\",\"qiniuAccessKey\":\"NrgMfABZxWLo5B-YYSjoE8-AZ1EISdi1Z3ubLOeZ\",\"qiniuBucketName\":\"ios-app\",\"qiniuDomain\":\"http://7xqbwh.dl1.z0.glb.clouddn.com\",\"qiniuPrefix\":\"upload\",\"qiniuSecretKey\":\"uIwJHevMRWU0VLxFvgy0tAcOdGqasdtVlJkdy6vV\",\"type\":1}', '0', '云存储配置信息');
 INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('30', '1', '文件上传', 'modules/oss/oss.html', 'sys:oss:all', '1', 'fa fa-file-image-o', '6');
-
 
 
 -- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -365,7 +365,7 @@ INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, 
 INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('32', '31', '用例管理', 'modules/test/stressTest.html', 'test:stress', '1', 'fa fa-briefcase', '1');
 INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('33', '31', '脚本文件管理', 'modules/test/stressTestFile.html', 'test:stress', '1', 'fa fa-file-text-o', '2');
 INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('34', '31', '测试报告管理', 'modules/test/stressTestReports.html', 'test:stress', '1', 'fa fa-area-chart', '3');
-INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('35', '31', '分布式节点管理', 'modules/test/stressTestSlave.html', 'test:stress', '1', 'fa fa-cloud', '4');
+INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('35', '31', '分布式节点管理', 'modules/test/stressTestSlave.html', 'test:stress', '1', 'fa fa-cloud', '5');
 
 -- 性能测试用例表
 CREATE TABLE `test_stress_case` (
@@ -457,9 +457,6 @@ INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('6',
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('7', 'JMETER_THREADGROUP_SET_KEY', 'false', '1', 'true：开启线程组管理功能，上传脚本时线程组配置将入库管理，默认false。');
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('8', 'SCRIPT_SCHEDULER_DURATION_KEY', 'true', '1', 'true:脚本限时执行生效，具体时间由脚本单独配置，是默认值 false:取消脚本限时执行');
 
--- Grafana监控视图
-INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('36', '31', 'Grafana监控视图', 'http://127.0.0.1:3000', NULL, '1', 'fa fa-clipboard', '5');
-
 -- 调试/接口测试报告文件表(smooth 20181205)
 CREATE TABLE `test_debug_case_reports` (
   `report_id` bigint NOT NULL AUTO_INCREMENT,
@@ -477,15 +474,6 @@ CREATE TABLE `test_debug_case_reports` (
   PRIMARY KEY (`report_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='调试/接口测试报告文件表';
 
--- 修改菜单，添加调试报告管理界面（smooth 20181205）
-update `sys_menu` set `menu_id`='37',`order_num`='6' where `menu_id`='36';
-update `sys_menu` set `menu_id`='36',`order_num`='5' where `menu_id`='35';
-INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('35', '31', '调试报告管理', 'modules/test/debugTestReports.html', 'test:debug', '1', 'fa fa-area-chart', '4');
-
--- 添加线程组管理界面（smooth 20190402）
--- 脚本线程组管理
-INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('38', '31', '脚本线程组管理', 'modules/test/stressThreadSet.html', 'test:teststressthreadset', '1', 'fa fa-clipboard', '6');
-INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('39', '38', '修改', NULL, 'test:teststressthreadset:update,test:teststressthreadset:select', '2', NULL, '0');
 DROP TABLE IF EXISTS `test_stress_thread_set`;
 CREATE TABLE `test_stress_thread_set` (
   `set_id` varchar(40) NOT NULL,
@@ -499,3 +487,11 @@ CREATE TABLE `test_stress_thread_set` (
   `file_id` bigint(20) DEFAULT NULL COMMENT '所属脚本文件ID',
   PRIMARY KEY (`set_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='线程组管理';
+
+INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('36', '31', '调试报告管理', 'modules/test/debugTestReports.html', 'test:debug', '1', 'fa fa-area-chart', '4');
+
+-- 脚本线程组管理（smooth 20190402）
+INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('37', '31', '脚本线程组管理', 'modules/test/stressThreadSet.html', 'test:teststressthreadset', '1', 'fa fa-clipboard', '6');
+INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('38', '37', '修改', NULL, 'test:teststressthreadset:update,test:teststressthreadset:select', '2', NULL, '0');
+-- Grafana监控视图
+INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('39', '31', 'Grafana监控视图', 'http://127.0.0.1:3000', NULL, '1', 'fa fa-clipboard', '7');

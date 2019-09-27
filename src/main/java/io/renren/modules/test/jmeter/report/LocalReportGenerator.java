@@ -249,6 +249,8 @@ public class LocalReportGenerator {
         Map<String, GraphConfiguration> graphConfigurations = configuration
                 .getGraphConfigurations();
 
+        // smooth00 add
+        log.info("Jmeter Engine Version: v"+JMeterUtils.getJMeterVersion());
         // Process configuration to build graph consumers
         for (Map.Entry<String, GraphConfiguration> entryGraphCfg : graphConfigurations.entrySet()) {
             addGraphConsumer(nameFilter, excludeControllerFilter, entryGraphCfg);

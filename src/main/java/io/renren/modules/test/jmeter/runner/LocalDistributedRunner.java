@@ -40,7 +40,7 @@ import java.rmi.RemoteException;
 import java.util.*;
 
 /**
- * 这个类来自Jmeter4.0，所以如果未来高版本要求需要修改此类。
+ * 这个类来自Jmeter4.0，与5.1.1做了兼容性比对和改造，如果未来有更高版本可能需要修改此类。
  * 此类是为了增加一个需求：按照分布式的节点机的权重来配比压力负载。
  * 因为默认的Jmeter是每一个负载机都使用相同的脚本，相同的压力，这和实际情况并不相符。
  * 当前是压测平台需要使用这个功能，如果未来Jmeter已经提供类似方案，可以另行借鉴。
@@ -52,6 +52,8 @@ import java.util.*;
  * @see org.apache.jmeter.gui.action.RemoteStart
  */
 public class LocalDistributedRunner {
+    private static final String HOST_NOT_FOUND_MESSAGE = "Host not found in list of active engines: {}";
+
     private static final Logger log = LoggerFactory.getLogger(org.apache.jmeter.engine.DistributedRunner.class);
 
     public static final String RETRIES_NUMBER = "client.tries"; // $NON-NLS-1$
@@ -152,7 +154,7 @@ public class LocalDistributedRunner {
 
         if (!addrs.isEmpty()) {
             String msg = "Following remote engines could not be configured:" + addrs;
-            if (!continueOnFail || engines.size() == 0) {
+            if (!continueOnFail || engines.isEmpty()) {
                 stop();
                 throw new RuntimeException(msg); // NOSONAR
             } else {
@@ -176,7 +178,7 @@ public class LocalDistributedRunner {
                 if (engines.containsKey(address)) {
                     engines.get(address).runTest();
                 } else {
-                    log.warn("Host not found in list of active engines: {}", address);
+                    log.warn(HOST_NOT_FOUND_MESSAGE, address);
                 }
             } catch (IllegalStateException | JMeterEngineException e) { // NOSONAR already reported to user
                 JMeterUtils.reportErrorToUser(e.getMessage(), JMeterUtils.getResString("remote_error_starting")); // $NON-NLS-1$
@@ -201,7 +203,7 @@ public class LocalDistributedRunner {
                 if (engines.containsKey(address)) {
                     engines.get(address).stopTest(true);
                 } else {
-                    log.warn("Host not found in list of active engines: {}", address);
+                    log.warn(HOST_NOT_FOUND_MESSAGE, address);
                 }
             } catch (RuntimeException e) {
                 errln("Failed to stop test on " + address, e);
@@ -226,7 +228,7 @@ public class LocalDistributedRunner {
                 if (engines.containsKey(address)) {
                     engines.get(address).stopTest(false);
                 } else {
-                    log.warn("Host not found in list of active engines: {}", address);
+                    log.warn(HOST_NOT_FOUND_MESSAGE, address);
                 }
 
             } catch (RuntimeException e) {
@@ -243,7 +245,7 @@ public class LocalDistributedRunner {
                 if (engines.containsKey(address)) {
                     engines.get(address).exit();
                 } else {
-                    log.warn("Host not found in list of active engines: {}", address);
+                    log.warn(HOST_NOT_FOUND_MESSAGE, address);
                 }
             } catch (RuntimeException e) {
                 errln("Failed to exit on " + address, e);

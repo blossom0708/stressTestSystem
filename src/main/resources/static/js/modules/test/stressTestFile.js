@@ -168,7 +168,7 @@ var vm = new Vue({
                 setTimeout(() => {
                 //this.$refs.queryResult.click()
                 this.query()
-            }, 100)
+            }, 500)
         })
         }
     },

@@ -82,14 +82,13 @@ var vm = new Vue({
         title: null,
         showList: true
     },
-    mounted() {
+    mounted: function () {
         if (this.q.caseId) {
             // 如果caseId不为空，说明是从用例页面传入CaseId
-            this.$nextTick(() => {
+            this.$nextTick(function () {
                 // 加上延时避免 mounted 方法比页面加载早执行
-                setTimeout(() => {
-                    //this.$refs.queryResult.click()
-                    this.query()
+                setTimeout(function () {
+                    vm.query()
                 }, 500)
             })
         }

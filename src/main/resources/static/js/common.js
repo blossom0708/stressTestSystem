@@ -167,3 +167,11 @@ function conver(limit) {
     }
     return sizestr;
 }
+
+// 获取页面跳转传过来的参数
+function getQueryString (name) {
+    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if(r!=null) return  decodeURI(r[2]);
+    return null;
+}

@@ -79,6 +79,9 @@ var vm = new Vue({
                 });
             });
         },
+        back: function () {
+            history.go(-1);
+        },
         saveOrUpdate: function () {
             if(vm.validator()){
                 return ;
@@ -92,7 +95,7 @@ var vm = new Vue({
                 data: JSON.stringify(vm.menu),
                 success: function(r){
                     if(r.code === 0){
-                        alert('操作成功', function(){
+                        alert('保存成功，需同步配置生效！', function(){
                             vm.reload();
                         });
                     }else{
@@ -214,10 +217,15 @@ function getMenuId () {
     }
 }
 
-
 $(function () {
     var colunms = Menu.initColumn();
-    var table = new TreeTable(Menu.id, baseURL + "test/teststressthreadset/list", colunms);
+    var url = "test/teststressthreadset/list";
+    var fileids = getQueryString("FileIDs");
+    if(fileids != null && fileids != ""){
+        fileids = fileids.split(",");
+        url += "/" + fileids;
+    }
+    var table = new TreeTable(Menu.id, baseURL + url, colunms);
     table.setExpandColumn(2);
     table.setIdField("setId");
     table.setCodeField("setId");

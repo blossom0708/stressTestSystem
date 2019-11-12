@@ -1,15 +1,14 @@
 package io.renren.modules.test.controller;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.renren.modules.test.entity.TestStressThreadSetEntity;
 import io.renren.modules.test.service.TestStressThreadSetService;
@@ -34,9 +33,22 @@ public class TestStressThreadSetController {
 	 * 所有配置列表
 	 */
 	@RequestMapping("/list")
-	@RequiresPermissions("test:teststressthreadset:list")
+	@RequiresPermissions("test:stress:fileList")
 	public List<TestStressThreadSetEntity> list(){
 		List<TestStressThreadSetEntity> testStressThreadSetList = testStressThreadSetService.queryList(new HashMap<String, Object>());
+
+		return testStressThreadSetList;
+	}
+
+	/**
+	 * 指定脚本的配置列表
+	 */
+	@RequestMapping("/list/{fileIds}")
+	@RequiresPermissions("test:stress:fileList")
+	public List<TestStressThreadSetEntity> list(@PathVariable("fileIds") String[] fileIds){
+		Map<String,Object> map = new HashMap<String, Object>();
+		map.put("fileids", Arrays.asList(fileIds));
+		List<TestStressThreadSetEntity> testStressThreadSetList = testStressThreadSetService.queryList(map);
 
 		return testStressThreadSetList;
 	}
@@ -45,7 +57,7 @@ public class TestStressThreadSetController {
 	 * 选择配置项(添加、修改配置项)
 	 */
 	@RequestMapping("/select")
-	@RequiresPermissions("test:teststressthreadset:select")
+	@RequiresPermissions("test:stress")
 	public R select(){
 		//查询列表数据
 		List<TestStressThreadSetEntity> testStressThreadSetList = testStressThreadSetService.queryNotSetList();
@@ -65,7 +77,7 @@ public class TestStressThreadSetController {
 	 * 信息
 	 */
 	@RequestMapping("/info/{setId}")
-	@RequiresPermissions("test:teststressthreadset:info")
+	@RequiresPermissions("test:stress")
 	public R info(@PathVariable("setId") String setId){
 		TestStressThreadSetEntity testStressThreadSet = testStressThreadSetService.queryObject(setId);
 		
@@ -76,7 +88,7 @@ public class TestStressThreadSetController {
 	 * 保存
 	 */
 	@RequestMapping("/save")
-	@RequiresPermissions("test:teststressthreadset:save")
+	@RequiresPermissions("test:stress:save")
 	public R save(@RequestBody TestStressThreadSetEntity testStressThreadSet){
 		testStressThreadSetService.save(testStressThreadSet);
 		
@@ -87,7 +99,7 @@ public class TestStressThreadSetController {
 	 * 修改
 	 */
 	@RequestMapping("/update")
-	@RequiresPermissions("test:teststressthreadset:update")
+	@RequiresPermissions("test:stress:update")
 	public R update(@RequestBody TestStressThreadSetEntity testStressThreadSet){
 		testStressThreadSetService.update(testStressThreadSet);
 		
@@ -98,7 +110,7 @@ public class TestStressThreadSetController {
 	 * 删除
 	 */
 	@RequestMapping("/delete")
-	@RequiresPermissions("test:teststressthreadset:delete")
+	@RequiresPermissions("test:stress:delete")
 	public R delete(@RequestBody String[] setIds){
 		testStressThreadSetService.deleteBatch(setIds);
 		
@@ -111,7 +123,7 @@ public class TestStressThreadSetController {
      */
     @SysLog("将线程组配置同步到对应脚本文件中")
     @RequestMapping("/synchronizeJmx")
-    @RequiresPermissions("test:teststressthreadset:synchronizeJmx")
+    @RequiresPermissions("test:stress:synchronizeJmx")
     public R synchronizeJmx(@RequestBody Long fileId) throws DocumentException {
     	testStressThreadSetService.synchronizeJmx(fileId);
         return R.ok();

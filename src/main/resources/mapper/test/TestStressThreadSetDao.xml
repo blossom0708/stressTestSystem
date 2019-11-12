@@ -28,8 +28,17 @@
 	</select>
 	
 	<select id="queryList" resultType="io.renren.modules.test.entity.TestStressThreadSetEntity">
-		select m.*,(select p.name from test_stress_thread_set p where p.set_id = m.parent_id) as parentName 
+		select m.*,(select p.name from test_stress_thread_set p where p.set_id = m.parent_id) as parentName
 			from test_stress_thread_set m
+		<where>
+			<if test="fileids != null and fileids.size() >0">
+				m.file_id in
+				<foreach item="item" index="index" collection="fileids"
+						 open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
         <choose>
             <when test="sidx != null and sidx.trim() != ''">
                 order by m.${sidx} ${order}

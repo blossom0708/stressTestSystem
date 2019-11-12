@@ -359,6 +359,35 @@ var vm = new Vue({
             vm.title = "添加任务";
             vm.stressTestFile = {beanName: 'stressTestTask', methodName: 'stressTest', params: fileIds.toString(), cronEditType: 0};
         },
+        threadSet: function(){
+            var fileIds = getSelectedRows();
+            var isAllJmxs = true;
+            if (fileIds == null) {
+                return;
+            } else {
+                for(var i in fileIds){
+                    $.get(baseURL + "test/stressFile/info/" + fileIds[i], function (r) {
+                        if (!(getExtension(r.stressTestFile.originName) &&
+                            /^(jmx)$/.test(getExtension(r.stressTestFile.originName).toLowerCase()))) {
+                            isAllJmxs = false;
+                            alert(r.stressTestFile.originName + '非脚本文件，不能修改线程组！');
+                            vm.reload();
+                        } else {
+                            if(1 == r.stressTestFile.status){
+                                isAllJmxs = false;
+                                alert(r.stressTestFile.originName + '正在运行，禁止修改线程组！');
+                                vm.reload();
+                            }
+                            setTimeout(function (){
+                                if (isAllJmxs && i == fileIds.length-1) {
+                                    window.location.href= baseURL +"modules/test/stressThreadSet.html?FileIDs=" + fileIds;
+                                }
+                            }, 200);
+                        }
+                    });
+                }
+            }
+        },
         chkCronEditType: function () {
             if(1 == vm.stressTestFile.cronEditType){
                 vm.showCronManual = false;
@@ -466,14 +495,6 @@ function synchronizeFile(fileIds) {
             }
         });
     });
-}
-
-function getQueryString (name) {
-    // 获取用例页面传过来的CaseId
-    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
-    var r = window.location.search.substr(1).match(reg);
-    if(r!=null) return  decodeURI(r[2]);
-    return null;
 }
 
 var timeTicket;

@@ -38,6 +38,7 @@
             &nbsp;<input type="button" class="btn btn-success" @click="reload" value="刷新"/>
             <a v-if="hasPermission('sys:schedule:save')" class="btn btn-primary" @click="addTask">&nbsp;加入任务</a>
             <a v-if="hasPermission('sys:schedule:update')" class="btn btn-primary" @click="queryTask">&nbsp;查看任务</a>
+            <a v-if="hasPermission('test:stress')" class="btn btn-primary" @click="threadSet">&nbsp;线程组</a>
             &nbsp;&nbsp;<input v-if="getQueryString('CaseID')" type="button" class="btn btn-warning" @click="back" value="返回"/>
             <!--<a v-if="hasPermission('test:stress')" class="btn btn-danger" style="float:right;" href="stressTestReports.html">测试报告</a>-->
         </div>

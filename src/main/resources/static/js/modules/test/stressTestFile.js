@@ -398,7 +398,7 @@ var vm = new Vue({
             }
         },
         queryTask: function () {
-            window.location.href = "/modules/job/schedule.html?BeanName=stressTestTask";
+            window.location.href = baseURL + "modules/job/schedule.html?BeanName=stressTestTask";
         },
         saveTask: function () {
             if(1 == vm.stressTestFile.cronEditType){

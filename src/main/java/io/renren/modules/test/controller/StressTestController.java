@@ -97,19 +97,24 @@ public class StressTestController {
         String casePath = stressTestUtils.getCasePath();
 
         Map<String, Object> query = new HashMap<String, Object>();
+        if (2 == stressTestUtils.ReplaceFileKey()) {
+            // caseId加入搜索条件，允许在不同用例间上传同名文件
+            query.put("caseId", caseId);
+        }
         query.put("originName", originName);
         // fileList中最多有一条记录
         List<StressTestFileEntity> fileList = stressTestFileService.queryList(query);
         //数据库中已经存在同名文件
         if (!fileList.isEmpty()) {
             // 不允许上传同名文件
-            if (!stressTestUtils.isReplaceFile()) {
+            if (0 == stressTestUtils.ReplaceFileKey()) {
                 //throw new RRException("系统中已经存在此文件记录！不允许上传同名文件！");
             	return R.ok().put("error","系统中已经存在此文件记录！不允许上传同名文件！");
             } else {// 允许上传同名文件方式是覆盖。
                 for (StressTestFileEntity stressCaseFile : fileList) {
-                    // 如果是不同用例，但是要上传同名文件，是不允许的，这是数据库的唯一索引要求的。
-                    if (Long.valueOf(caseId) != stressCaseFile.getCaseId()) {
+                    // 就算是不同用例下，也不允许上传同名文件。
+                    if (stressTestUtils.ReplaceFileKey() != 2
+                            && Long.valueOf(caseId) != stressCaseFile.getCaseId()) {
                         //throw new RRException("其他用例已经包含此同名文件！");
                     	return R.ok().put("error","其他用例已经包含此同名文件！");
                     }

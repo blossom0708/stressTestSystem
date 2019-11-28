@@ -154,8 +154,8 @@ public class StressTestUtils {
     	return Boolean.parseBoolean(sysConfigService.getValue(MASTER_JMETER_USE_SCRIPT_KEY));
     }
 
-    public boolean isReplaceFile() {
-    	return Boolean.parseBoolean(sysConfigService.getValue(MASTER_JMETER_REPLACE_FILE_KEY));
+    public int ReplaceFileKey() {
+        return Integer.parseInt(sysConfigService.getValue(MASTER_JMETER_REPLACE_FILE_KEY));
     }
     
     public boolean isMasterGenerateReport() {

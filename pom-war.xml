@@ -34,9 +34,10 @@
         <aliyun.oss.version>2.5.0</aliyun.oss.version>
         <qcloud.cos.version>4.4</qcloud.cos.version>
         <swagger.version>2.2.2</swagger.version>
-        <jmeter.version>${version}</jmeter.version>
+        <jmeter.version>${project.version}</jmeter.version>
         <jmeter.websocket.version>1.2.2</jmeter.websocket.version>
         <jetty.version>9.4.12.RC2</jetty.version>
+        <jmeter.plugins.version>1.4.0</jmeter.plugins.version>
     </properties>
 
     <dependencies>
@@ -284,10 +285,21 @@
             <artifactId>websocket-api</artifactId>
             <version>${jetty.version}</version>
         </dependency>
+        <!-- 以下第三方kg.apc插件 -->
+        <dependency>
+            <groupId>kg.apc</groupId>
+            <artifactId>jmeter-plugins-extras-libs</artifactId>
+            <version>${jmeter.plugins.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>kg.apc</groupId>
+            <artifactId>jmeter-plugins-standard</artifactId>
+            <version>${jmeter.plugins.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
-        <finalName>${artifactId}</finalName>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

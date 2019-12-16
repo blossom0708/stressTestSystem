@@ -12,6 +12,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,36 @@ public class StressTestSlaveController {
         PageUtils pageUtil = new PageUtils(stressTestList, total, query.getLimit(), query.getPage());
 
         return R.ok().put("page", pageUtil);
+    }
+
+    /**
+     * 分布式节点可用列表
+     */
+    @RequestMapping("/list/enable")
+    @RequiresPermissions("test:stress:slaveList")
+    public R listForStatus(@RequestParam Map<String, Object> params) {
+        //查询列表数据
+        Query query = new Query(StressTestUtils.filterParms(params));
+        query.put("status",stressTestUtils.ENABLE);
+        List<StressTestSlaveEntity> stressTestList = stressTestSlaveService.queryList(query);
+        int total = stressTestSlaveService.queryTotal(query);
+
+        PageUtils pageUtil = new PageUtils(stressTestList, total, query.getLimit(), query.getPage());
+
+        return R.ok().put("page", pageUtil);
+    }
+
+    /**
+     * 分布式节点可用数量
+     */
+    @RequestMapping("/list/enableTotal")
+    @RequiresPermissions("test:stress:slaveList")
+    public R listEnableTotal() {
+        Map<String, Object> query = new HashMap<String, Object>();
+        query.put("status",stressTestUtils.ENABLE);
+        int total = stressTestSlaveService.queryTotal(query);
+
+        return R.ok().put("total", total);
     }
 
     /**
@@ -93,7 +124,6 @@ public class StressTestSlaveController {
 
         return R.ok();
     }
-
 
     /**
      * 切换性能测试分布式节点状态

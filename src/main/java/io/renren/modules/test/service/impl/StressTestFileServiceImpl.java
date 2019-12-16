@@ -62,6 +62,8 @@ public class StressTestFileServiceImpl implements StressTestFileService {
 
     private static final String JMETER_INSTALLATION_DIRECTORY;
 
+    private static Long[] getSlaveIds = null;
+
     /**
      * 增加了一个static代码块，本身是从Jmeter的NewDriver源码中复制过来的。
      * Jmeter的api中是删掉了这部分代码的，需要从Jmeter源码中才能看到。
@@ -188,6 +190,9 @@ public class StressTestFileServiceImpl implements StressTestFileService {
     public void save(StressTestFileEntity stressTestFile) {
         stressTestFileDao.save(stressTestFile);
     }
+
+    @Override
+    public void setSlaveId(Long[] slaveIds) { getSlaveIds = slaveIds;}
 
     /**
      * 保存用例文件及入库
@@ -521,6 +526,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
             }
 
             HashTree jmxTree = SaveService.loadTree(jmxFile);
+            // jmeter5 建议换用 JMeter.convertSubTree(jmxTree,false);
             JMeter.convertSubTree(jmxTree);
 
             JmeterResultCollector jmeterResultCollector = null;
@@ -944,6 +950,13 @@ public class StressTestFileServiceImpl implements StressTestFileService {
     public String getSlaveIPPort() {
         Map query = new HashMap<>();
         query.put("status", StressTestUtils.ENABLE);
+        if(0 == getSlaveIds[0]){
+            // 0表示主节点压测
+            return "";
+        }
+        if(getSlaveIds != null){
+            query.put("slaveIds",Arrays.asList(getSlaveIds));
+        }
         List<StressTestSlaveEntity> stressTestSlaveList = stressTestSlaveDao.queryList(query);
 
         StringBuilder stringBuilder = new StringBuilder();

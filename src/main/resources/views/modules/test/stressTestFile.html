@@ -163,6 +163,19 @@
             </div>
         </form>
     </div>
+    <div v-show="showSlave">
+        <div class="grid-btn">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control"  placeholder="用例ID">
+            </div>
+            <a class="btn btn-default" >查询</a>
+            <a v-if="hasPermission('test:stress')" class="btn btn-primary" @click="runOnceNow"><i class="fa fa-pencil-square-o"></i>&nbsp;确认</a>
+            &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="取消"/>
+            <span>&nbsp;&nbsp;不选择则表示主节点压测</span>
+        </div>
+        <table id="jqSlaveGrid"></table>
+        <div id="jqSlaveGridPager"></div>
+    </div>
 </div>
 
 <script src="../../js/modules/test/stressTestFile.js"></script>

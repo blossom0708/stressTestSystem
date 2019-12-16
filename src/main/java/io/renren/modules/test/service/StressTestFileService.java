@@ -119,4 +119,9 @@ public interface StressTestFileService {
      * 某个进程内执行的脚本，可以使用这个方法停止
      */
     void stopSingle(Long fileId);
+
+    /**
+     * 限定SlaveIds，让压测在指定节点进行
+     */
+    void setSlaveId(Long[] slaveIds);
 }

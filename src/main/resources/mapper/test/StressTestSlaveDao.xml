@@ -16,8 +16,11 @@
             <if test="status != null">
                 `status` = #{status}
             </if>
-            <if test="slaveIds != null and slaveIds.trim() != ''">
-                slave_id in ( #{slaveIds} )
+            <if test="slaveIds != null and slaveIds.size() >0">
+               and slave_id in
+                <foreach item="slaveId" index="index" collection="slaveIds"  open="(" separator="," close=")">
+                    #{slaveId}
+                </foreach>
             </if>
         </where>
         <if test="sidx != null and sidx.trim() != ''">
@@ -33,6 +36,9 @@
         <where>
             <if test="slaveName != null and slaveName.trim() != ''">
                 slave_name like concat('%', #{slaveName}, '%')
+            </if>
+            <if test="status != null">
+                `status` = #{status}
             </if>
         </where>
     </select>

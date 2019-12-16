@@ -157,6 +157,8 @@ var vm = new Vue({
         showList: true,
         showEdit: false,
         showTask: false,
+        showSlave: false,
+        s_fileds: '',
         showCronManual: false,
         showCronGenerate: false
     },
@@ -188,6 +190,7 @@ var vm = new Vue({
             vm.showChart = false;
             vm.showEdit = true;
             vm.showTask = false;
+            vm.showSlave = false;
             vm.title = "配置";
             if (fileIds.length > 1) {
                 vm.stressTestFile.reportStatus = 0;
@@ -294,6 +297,7 @@ var vm = new Vue({
             vm.showList = true;
             vm.showEdit = false;
             vm.showTask = false;
+            vm.showSlave = false;
             var page = $("#jqGrid").jqGrid('getGridParam', 'page');
             $("#jqGrid").jqGrid('setGridParam', {
                 postData: {'caseId': vm.q.caseId},
@@ -354,6 +358,7 @@ var vm = new Vue({
             }
             vm.showList = false;
             vm.showTask = true;
+            vm.showSlave = false;
             vm.showCronManual = true;
             vm.showCronGenerate = false;
             vm.title = "添加任务";
@@ -430,25 +435,100 @@ var vm = new Vue({
                     }
                 }
             });
+        },
+        getSlave: function (fileds) {
+            vm.s_fileds = fileds;
+            $("#jqSlaveGrid").jqGrid({
+                url: baseURL + 'test/stressSlave/list/enable',
+                datatype: "json",
+                colModel: [
+                    {label: '节点ID', name: 'slaveId', width: 100, key: true},
+                    {label: '待选节点名称', name: 'slaveName', width: 180, sortable: false},
+                    {label: 'IP地址', name: 'ip', width: 100, sortable: false},
+                    {label: '端口', name: 'jmeterPort', width: 80, sortable: false},
+                    {label: '安装路径', name: 'homeDir', width: 260, sortable: false},
+                    {
+                        label: '状态', name: 'status', width: 80, formatter: function (value, options, row) {
+                            if (value === 0) {
+                                return '<span class="label label-default">禁用</span>';
+                            } else if (value === 1) {
+                                return '<span class="label label-success">启用</span>';
+                            } else if (value === 2) {
+                                return '<span class="label label-warning">变更中</span>';
+                            } else if (value === 3) {
+                                return '<span class="label label-danger">异常</span>';
+                            }
+                        }
+                    },
+                    {label: '权重(%)', name: 'weight', width: 80, sortable: false}
+                ],
+                viewrecords: true,
+                height: $(window).height() - 250,
+                rowNum: 50,
+                rowList: [10, 30, 50, 100, 200],
+                rownumbers: true,
+                rownumWidth: 25,
+                autowidth: true,
+                multiselect: true,
+                pager: "#jqSlaveGridPager",
+                jsonReader: {
+                    root: "page.list",
+                    page: "page.currPage",
+                    total: "page.totalPage",
+                    records: "page.totalCount"
+                },
+                prmNames: {
+                    page: "page",
+                    rows: "limit",
+                    order: "order"
+                },
+                gridComplete: function () {
+                    //隐藏grid底部滚动条
+                    $("#jqSlaveGrid").closest(".ui-jqgrid-bdiv").css({"overflow-x": "hidden"});
+                }
+            });
+            vm.showList = false;
+            vm.showSlave = true;
+        },
+        runOnceNow: function () {
+            var grid = $("#jqSlaveGrid");
+            var rowKey = grid.getGridParam("selrow");
+            var slaveIds = [0];
+            if (rowKey) {
+                slaveIds = grid.getGridParam("selarrrow");
+            }
+
+            runOnce(vm.s_fileds,slaveIds);
+            vm.reload();
         }
     }
 });
 
-function runOnce(fileIds) {
+function runOnce(fileIds,slaveIds) {
     if (!fileIds) {
         return;
     }
-    $.ajax({
-        type: "POST",
-        url: baseURL + "test/stressFile/runOnce",
-        contentType: "application/json",
-        data: JSON.stringify(numberToArray(fileIds)),
-        success: function (r) {
-            if (r.code == 0) {
-                vm.reload();
-                alert(r.msg, function () {
-                });
-            }
+    var postURL = "test/stressFile/runOnce";
+    if(slaveIds){
+        postURL = "test/stressFile/runOnce/"+slaveIds;
+    }
+    $.get(baseURL + "test/stressSlave/list/enableTotal", function (r) {
+        if (slaveIds || r.total < 2){
+            $.ajax({
+                type: "POST",
+                url: baseURL + postURL,
+                contentType: "application/json",
+                data: JSON.stringify(numberToArray(fileIds)),
+                success: function (r) {
+                    if (r.code == 0) {
+                        vm.reload();
+                        alert(r.msg, function () {
+                        });
+                    }
+                }
+            });
+        } else {
+            vm.getSlave(fileIds);
         }
     });
 }
@@ -570,6 +650,7 @@ function ShowRunning(fileId) {
     vm.showChart = true;
     vm.showEdit = false;
     vm.showList = false;
+    vm.showSlave = false;
     startInterval(fileId);
 }
 

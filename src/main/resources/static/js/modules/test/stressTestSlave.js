@@ -17,7 +17,7 @@ $(function () {
                 } else if (value === 1) {
                     return '<span class="label label-success">启用</span>';
                 } else if (value === 2) {
-                    return '<span class="label label-warning">进行中</span>';
+                    return '<span class="label label-warning">变更中</span>';
                 } else if (value === 3) {
                     return '<span class="label label-danger">异常</span>';
                 }

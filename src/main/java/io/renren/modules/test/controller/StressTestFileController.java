@@ -98,6 +98,17 @@ public class StressTestFileController {
     }
 
     /**
+     * 立即执行性能测试脚本(带slave参数)。
+     */
+    @SysLog("立即执行性能测试用例脚本文件")
+    @RequestMapping("/runOnce/{slaveIds}")
+    @RequiresPermissions("test:stress:runOnce")
+    public R runRSlave(@RequestBody Long[] fileIds,@PathVariable("slaveIds") Long[] slaveIds) {
+        stressTestFileService.setSlaveId(slaveIds);
+        return R.ok(stressTestFileService.run(fileIds));
+    }
+
+    /**
      * 立即停止性能测试脚本，仅有使用api方式时，才可以单独停止。
      */
     @SysLog("立即停止性能测试用例脚本文件")

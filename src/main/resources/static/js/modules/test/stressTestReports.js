@@ -32,6 +32,8 @@ $(function () {
                     return '<span class="label label-success">执行成功</span>';
                 } else if (value === 3) {
                     return '<span class="label label-danger">出现异常</span>';
+                } else if (value === 4) {
+                    return '<span class="label label-danger">文件缺失</span>';
                 }
             }
             },

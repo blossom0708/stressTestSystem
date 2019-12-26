@@ -258,7 +258,7 @@ public class StressTestReportsServiceImpl implements StressTestReportsService {
         CommandLine cmdLine = new CommandLine(jmeterHomeBin + File.separator + jmeterExc);
         // 设置参数，-g 指定测试结果文件路径，仅用于生成测试报告
         cmdLine.addArgument("-g");
-        Map map = new HashMap();
+        Map<String, File> map = new HashMap<>();
         map.put("csvFile", new File(csvPath));
         File reportDir = new File(reportPathDir);
         map.put("reportDir", reportDir);

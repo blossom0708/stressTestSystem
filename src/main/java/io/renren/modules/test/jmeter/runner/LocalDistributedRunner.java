@@ -119,7 +119,7 @@ public class LocalDistributedRunner {
                     treeClone = cloner.getClonedTree();
 
                     for (HashTree item : treeClone.values()) {
-                        Set treeKeys = item.keySet();
+                        Set<?> treeKeys = item.keySet();
                         for (Object key : treeKeys) {
                             if (key instanceof ThreadGroup) {
                                 int originThreadNum = Integer.parseInt(((ThreadGroup) key).getPropertyAsString(ThreadGroup.NUM_THREADS));

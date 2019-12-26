@@ -62,8 +62,6 @@ public class JmeterRunEntity {
     /**
      * 停止当前脚本的压力引擎。
      */
-    private int numberOfActiveThreads = 0;
-
     public void stop() {
     	// 缓存中变更状态为成功执行
         runStatus = StressTestUtils.RUN_SUCCESS;
@@ -136,7 +134,7 @@ public class JmeterRunEntity {
     /**
      * 返回当前脚本所有的engine的正在活跃的或者已经启动的线程数量
      */
-    public Map getNumberOfActiveThreads() {
+    public Map<String, Integer> getNumberOfActiveThreads() {
     	// 当前脚本正在执行的active状态的线程数，是以脚本为单位，脚本内如果包含多个请求，则统计整体数量。
         int numberOfActiveThreads = 0;
         int numberOfStartedThreads = 0;

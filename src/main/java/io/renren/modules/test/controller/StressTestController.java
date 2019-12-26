@@ -209,7 +209,7 @@ public class StressTestController {
         for (Long caseId : caseIds) {
             List<StressTestFileEntity> fileList = stressTestFileService.queryList(caseId);
             if(!fileList.isEmpty()){ //判断是否有关联脚本文件
-            	ArrayList fileIdList = new ArrayList();
+                ArrayList<Long> fileIdList = new ArrayList<>();
             	for (StressTestFileEntity stressTestFile : fileList) {
                     fileIdList.add(stressTestFile.getFileId());
                 }

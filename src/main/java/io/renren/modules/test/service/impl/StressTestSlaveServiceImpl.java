@@ -203,7 +203,7 @@ public class StressTestSlaveServiceImpl implements StressTestSlaveService {
     public void batchReloadStatus(){
     	//当前是向所有的分布式节点推送这个，阻塞操作+轮询，并非多线程，因为本地同步网卡会是瓶颈。
     	//先处理已禁用的进程
-        Map query = new HashMap<>();
+        Map<String, Integer> query = new HashMap<>();
         query.put("status", StressTestUtils.DISABLE);      
         List<StressTestSlaveEntity> stressTestSlaveList = stressTestSlaveDao.queryList(query);
         for (StressTestSlaveEntity slave : stressTestSlaveList) {

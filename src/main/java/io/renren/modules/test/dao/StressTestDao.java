@@ -3,6 +3,7 @@ package io.renren.modules.test.dao;
 import io.renren.modules.sys.dao.BaseDao;
 import io.renren.modules.test.entity.StressTestEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Repository;
 
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import java.util.Map;
  * 性能测试
  * 
  */
+@Repository
 @Mapper
 public interface StressTestDao extends BaseDao<StressTestEntity> {
 	

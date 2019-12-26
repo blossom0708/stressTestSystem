@@ -155,7 +155,7 @@ public class LocalStandardJMeterEngine extends StandardJMeterEngine {
     @Override
     public void configure(HashTree testTree) {
         // Is testplan serialised?
-        SearchByClass jmeterTestPlan = new SearchByClass(JmeterTestPlan.class);
+        SearchByClass<JmeterTestPlan> jmeterTestPlan = new SearchByClass<>(JmeterTestPlan.class);
         JmeterTestPlan tpTemp = new JmeterTestPlan();
         // testPlan对应的是测试计划，每一个测试脚本之中只有一个测试计划，所以直接取第一个即可。
         // 交换key值，让我们的自实现的子类jmeterTestPlan进入。

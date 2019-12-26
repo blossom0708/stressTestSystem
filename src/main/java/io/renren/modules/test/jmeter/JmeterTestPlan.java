@@ -16,6 +16,7 @@ import java.io.IOException;
  * Created by zyanycall@gmail.com on 2018/11/5 16:14.
  */
 public class JmeterTestPlan extends TestPlan {
+    private static final long serialVersionUID = 1L;
     Logger logger = LoggerFactory.getLogger(getClass());
 
     // 为本地增加的脚本对象。

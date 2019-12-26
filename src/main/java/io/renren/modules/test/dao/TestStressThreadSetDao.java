@@ -6,6 +6,7 @@ import io.renren.modules.sys.dao.BaseDao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Repository;
 
 /**
  * 线程组管理
@@ -14,6 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
  * @email 
  * @date 2019-03-26 09:48:06
  */
+@Repository
 @Mapper
 public interface TestStressThreadSetDao extends BaseDao<TestStressThreadSetEntity> {
 	

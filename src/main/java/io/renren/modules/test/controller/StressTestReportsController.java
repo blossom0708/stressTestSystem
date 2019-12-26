@@ -30,8 +30,6 @@ import java.util.Map;
 public class StressTestReportsController {
     @Autowired
     private StressTestReportsService stressTestReportsService;
-    @Autowired
-    private StressTestUtils stressTestUtils;
 
     /**
      * 测试报告列表

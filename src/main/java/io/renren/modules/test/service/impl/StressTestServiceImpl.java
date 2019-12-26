@@ -1,9 +1,7 @@
 package io.renren.modules.test.service.impl;
 
-import io.renren.common.exception.RRException;
 import io.renren.modules.test.dao.DebugTestReportsDao;
 import io.renren.modules.test.dao.StressTestDao;
-import io.renren.modules.test.dao.StressTestFileDao;
 import io.renren.modules.test.dao.StressTestReportsDao;
 import io.renren.modules.test.entity.StressTestEntity;
 import io.renren.modules.test.service.StressTestService;
@@ -14,8 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +21,6 @@ public class StressTestServiceImpl implements StressTestService {
 
     @Autowired
     private StressTestDao stressTestDao;
-
-    @Autowired
-    private StressTestFileDao stressTestFileDao;
 
     @Autowired
     private StressTestReportsDao stressTestReportsDao;
@@ -71,13 +64,7 @@ public class StressTestServiceImpl implements StressTestService {
             StressTestEntity stressCase = queryObject(caseId);
             String casePath = stressTestUtils.getCasePath();
             String caseFilePath = casePath + File.separator + stressCase.getCaseDir();
-            try {
-                FileUtils.forceDelete(new File(caseFilePath));
-            } catch (FileNotFoundException e) {
-                //doNothing
-            } catch (IOException e) {
-                throw new RRException("删除文件异常失败", e);
-            }
+            FileUtils.deleteQuietly(new File(caseFilePath));
         }
         // 删除数据库内容
         // 脚本文件的删除调用file的自身方法，在controller中调用。因为file包含了分布式节点的数据。

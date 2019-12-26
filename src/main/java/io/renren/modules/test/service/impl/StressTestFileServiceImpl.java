@@ -175,7 +175,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
 
     @Override
     public List<StressTestFileEntity> queryList(Long caseId) {
-        Map query = new HashMap<>();
+        Map<String, String> query = new HashMap<>();
         query.put("caseId", caseId.toString());
         return stressTestFileDao.queryList(query);
     }
@@ -371,7 +371,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
             stressTestReports.setFile(csvFile);
         }
 
-        Map map = new HashMap();
+        Map<String, File> map = new HashMap<>();
         map.put("jmxFile", jmxFile);
         map.put("csvFile", csvFile);
         
@@ -417,7 +417,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
      * 执行Jmeter的脚本文件，采用Apache的commons-exec来执行。
      */
     public void excuteJmeterRunByScript(StressTestFileEntity stressTestFile,
-                                        StressTestReportsEntity stressTestReports, Map map) {
+                                        StressTestReportsEntity stressTestReports, Map<String, File> map) {
     	// 由于调试模式需要动态修改测试结果保存样式为JTL，而性能测试报告需要的格式为CSV（压测系统默认模式）。
         // 所以调试模式下如果运行脚本则无法生成测试报告，造成系统功能缺失。
         // 为避免后续问题，jmx如果使用了调试，则无法使用脚本方式运行。
@@ -478,9 +478,9 @@ public class StressTestFileServiceImpl implements StressTestFileService {
     /**
      * 本地执行Jmeter的脚本文件，采用Apache-Jmeter-Api来执行。
      */
-    public void excuteJmeterRunLocal(StressTestFileEntity stressTestFile, StressTestReportsEntity stressTestReports, Map map) throws RuntimeException {
-        File jmxFile = (File) map.get("jmxFile");
-        File csvFile = (File) map.get("csvFile");
+    public void excuteJmeterRunLocal(StressTestFileEntity stressTestFile, StressTestReportsEntity stressTestReports, Map<String, File> map) throws RuntimeException {
+        File jmxFile = map.get("jmxFile");
+        File csvFile = map.get("csvFile");
 
         try {
         	String slaveStr = stressTestFile.getSlaveStr();
@@ -605,7 +605,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
      * 将当前脚本所用到的文件保存起来。
      * 目前已知的最常用的有CSVDataSet类型的。
      */
-    public ArrayList fillFileAliaList(ArrayList<String> fileAliaList, HashTree hashTree) {
+    public ArrayList<String> fillFileAliaList(ArrayList<String> fileAliaList, HashTree hashTree) {
         for (Object os : hashTree.keySet()) {
             if (os instanceof CSVDataSet) {
                 // filename通过查看源码，没有发现有变化的地方，所以让其成为关键字。
@@ -625,7 +625,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
     public HashTree fixHashTreeDuration(HashTree jmxTree, StressTestFileEntity stressTestFile) {
         if (stressTestUtils.isScriptSchedulerDurationEffect() && stressTestFile.getDuration() > 0) {
             for (HashTree item : jmxTree.values()) {
-                Set treeKeys = item.keySet();
+                Set<?> treeKeys = item.keySet();
                 for (Object key : treeKeys) {
                     if (key instanceof ThreadGroup && ((ThreadGroup) key).getDuration() == 0 ) {
                         ((ThreadGroup) key).setProperty(ThreadGroup.SCHEDULER, true);
@@ -789,7 +789,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
     @Transactional
     public void synchronizeFile(Long[] fileIds) {
         //当前是向所有的分布式节点推送这个，阻塞操作+轮询，并非多线程，因为本地同步网卡会是瓶颈。
-        Map query = new HashMap<>();
+        Map<String, Integer> query = new HashMap<>();
         query.put("status", StressTestUtils.ENABLE);
         List<StressTestSlaveEntity> stressTestSlaveList = stressTestSlaveDao.queryList(query);
         //使用for循环传统写法
@@ -845,7 +845,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         stressTestFile.setStatus(StressTestUtils.RUN_SUCCESS);
         //由于事务性，这个地方不好批量更新。
         update(stressTestFile);
-        Map fileQuery = new HashMap<>();
+        Map<String, Object> fileQuery = new HashMap<>();
         fileQuery.put("originName", stressTestFile.getOriginName() + "_slaveId" + slave.getSlaveId());
         fileQuery.put("slaveId", slave.getSlaveId().toString());
         StressTestFileEntity newStressTestFile = stressTestFileDao.queryObjectForClone(fileQuery);
@@ -870,7 +870,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
     public void deleteSlaveFile(Long fileId) {
         StressTestFileEntity stressTestFile = queryObject(fileId);
         // 获取参数化文件同步到哪些分布式子节点的记录
-        Map fileQuery = new HashMap<>();
+        Map<String, Object> fileQuery = new HashMap<>();
         fileQuery.put("originName", stressTestFile.getOriginName() + "_slaveId");
         List<StressTestFileEntity> fileDeleteList = stressTestFileDao.queryListForDelete(fileQuery);
 
@@ -879,7 +879,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         }
         // 将同步过的分布式子节点的ID收集起来，用于查询子节点对象集合。
         String slaveIds = "";
-        ArrayList fileDeleteIds = new ArrayList();
+        ArrayList<Long> fileDeleteIds = new ArrayList<>();
         for (StressTestFileEntity stressTestFile4Slave : fileDeleteList) {
             if (stressTestFile4Slave.getSlaveId() == null) {
                 continue;
@@ -897,7 +897,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         }
 
         // 每一个参数化文件，会对应多个同步子节点slave的记录。
-        Map slaveQuery = new HashMap<>();
+        Map<String, Object> slaveQuery = new HashMap<>();
         slaveQuery.put("slaveIds", slaveIds);
         // 每一个被同步过的记录，都要执行删除操作。
         List<StressTestSlaveEntity> stressTestSlaveList = stressTestSlaveDao.queryList(slaveQuery);
@@ -932,7 +932,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
      * @return 分布式节点的IP地址拼装，不包含本地127.0.0.1的IP
      */
     public String getSlaveIPPort() {
-        Map query = new HashMap<>();
+        Map<String, Object> query = new HashMap<>();
         query.put("status", StressTestUtils.ENABLE);
         if(0 == getSlaveIds[0]){
             // 0表示主节点压测
@@ -962,7 +962,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
      * master节点是否被使用为压力节点
      */
     public boolean checkSlaveLocal() {
-        Map query = new HashMap<>();
+        Map<String, Integer> query = new HashMap<>();
         query.put("status", StressTestUtils.ENABLE);
         List<StressTestSlaveEntity> stressTestSlaveList = stressTestSlaveDao.queryList(query);
 
@@ -981,7 +981,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
      * @return 分布式节点的IP地址拼装，不包含本地127.0.0.1的IP
      */
     public Map<String, Integer> getSlaveAddrWeight() {
-        Map query = new HashMap<>();
+        Map<String, Integer> query = new HashMap<>();
         query.put("status", StressTestUtils.ENABLE);
         List<StressTestSlaveEntity> stressTestSlaveList = stressTestSlaveDao.queryList(query);
 

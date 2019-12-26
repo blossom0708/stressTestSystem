@@ -1,7 +1,6 @@
 package io.renren.modules.test.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 

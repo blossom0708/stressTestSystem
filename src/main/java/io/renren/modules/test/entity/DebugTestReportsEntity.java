@@ -6,4 +6,5 @@ package io.renren.modules.test.entity;
  * 目前调试测试报告还没有特殊字段。
  */
 public class DebugTestReportsEntity extends StressTestReportsEntity{
+    private static final long serialVersionUID = 1L;
 }

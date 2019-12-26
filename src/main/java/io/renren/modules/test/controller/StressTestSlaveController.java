@@ -25,9 +25,6 @@ public class StressTestSlaveController {
     @Autowired
     private StressTestSlaveService stressTestSlaveService;
 
-    @Autowired
-    private StressTestUtils stressTestUtils;
-
     /**
      * 分布式节点列表
      */
@@ -52,7 +49,7 @@ public class StressTestSlaveController {
     public R listForStatus(@RequestParam Map<String, Object> params) {
         //查询列表数据
         Query query = new Query(StressTestUtils.filterParms(params));
-        query.put("status",stressTestUtils.ENABLE);
+        query.put("status",StressTestUtils.ENABLE);
         List<StressTestSlaveEntity> stressTestList = stressTestSlaveService.queryList(query);
         int total = stressTestSlaveService.queryTotal(query);
 
@@ -68,7 +65,7 @@ public class StressTestSlaveController {
     @RequiresPermissions("test:stress:slaveList")
     public R listEnableTotal() {
         Map<String, Object> query = new HashMap<String, Object>();
-        query.put("status",stressTestUtils.ENABLE);
+        query.put("status",StressTestUtils.ENABLE);
         int total = stressTestSlaveService.queryTotal(query);
 
         return R.ok().put("total", total);

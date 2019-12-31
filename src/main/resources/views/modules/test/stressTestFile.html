@@ -34,7 +34,7 @@
             <a v-if="hasPermission('test:stress')" class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
             <a v-if="hasPermission('test:stress')" class="btn btn-primary" @click="stopAll"><i
                     class="fa fa-stop-circle"></i>&nbsp;全部停止</a>
-            <!--<a v-if="hasPermission('test:stress')" class="btn btn-primary" @click="stopAllNow"><i class="fa fa-stop-circle"></i>&nbsp;全部立即停止</a>-->
+            <a v-if="hasPermission('test:stress')" class="btn btn-danger" @click="stopAllNow"><i class="fa fa-stop-circle"></i>&nbsp;强制停止</a>
             &nbsp;<input type="button" class="btn btn-success" @click="reload" value="刷新"/>
             <a v-if="hasPermission('sys:schedule:save')" class="btn btn-primary" @click="addTask">&nbsp;加入任务</a>
             <a v-if="hasPermission('sys:schedule:update')" class="btn btn-primary" @click="queryTask">&nbsp;查看任务</a>
@@ -169,12 +169,13 @@
                 <input type="text" class="form-control"  placeholder="用例ID">
             </div>
             <a class="btn btn-default" >查询</a>
-            <a v-if="hasPermission('test:stress')" class="btn btn-primary" @click="runOnceNow"><i class="fa fa-pencil-square-o"></i>&nbsp;确认</a>
+            <a v-if="hasPermission('test:stress')" class="btn btn-primary" @click="runOnceNow"><i class="fa fa-pencil-square-o"></i>&nbsp;确定</a>
             &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="取消"/>
-            <span>&nbsp;&nbsp;不选择则表示主节点压测</span>
+            <span>&nbsp;&nbsp;不选择直接确定则表示主节点压测</span>
         </div>
         <table id="jqSlaveGrid"></table>
         <div id="jqSlaveGridPager"></div>
+        <div style="padding-top:16px;padding-top:16px;">（说明：压测前请确保参数文件已同步到各节点，否则会异常；多节点只要有一个节点异常压测进程就不能正常运行！）</div>
     </div>
 </div>
 

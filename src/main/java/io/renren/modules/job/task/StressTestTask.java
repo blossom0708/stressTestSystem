@@ -1,8 +1,8 @@
 package io.renren.modules.job.task;
 
-import io.renren.modules.test.entity.StressTestFileEntity;
 import io.renren.modules.test.utils.StressTestUtils;
 import io.renren.modules.test.service.StressTestFileService;
+import org.apache.commons.beanutils.ConvertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,22 +35,15 @@ public class StressTestTask {
 		
 		try {
 			String[] strParam = params.split(",");
-			Long[] fileIds = new Long[strParam.length];
-			for (int i = 0; i < strParam.length; i++) {
-				fileIds[i] = Long.valueOf(strParam[i]);
-				StressTestFileEntity stressTestFile = stressTestFileService.queryObject(fileIds[i]);
-				if(StressTestUtils.RUNNING.equals(stressTestFile.getStatus())) {
-					if (stressTestUtils.isUseJmeterScript()) {
-						// 以脚本方式运行，就停止所有脚本
-						stressTestFileService.stopAll();
-					} else {
-						// 以进程方式运行，就停止指定进程内正在执行的脚本
-						stressTestFileService.stopSingle(fileIds[i]);
-					}
-				}
-				stressTestFileService.runSingle(fileIds[i]);
+			Long[] fileIds = (Long[]) ConvertUtils.convert(strParam,Long.class);
+			if (stressTestUtils.isUseJmeterScript()) {
+				// 以脚本方式运行，就停止所有脚本
+				stressTestFileService.stopAll(false);
+			} else {
+				// 以进程方式运行，就停止指定进程内正在执行的脚本
+				stressTestFileService.stopAllNow(fileIds);
 			}
-			// stressTestFileService.run(fileIds);
+			stressTestFileService.run(fileIds);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -220,6 +220,9 @@ public class StressTestReportsServiceImpl implements StressTestReportsService {
         //设置开始执行命令生成报告
         stressTestReport.setStatus(StressTestUtils.RUNNING);
         update(stressTestReport);
+
+        //如果存在则清空
+        FileUtils.deleteQuietly(new File(reportPathDir));
         
         if (stressTestUtils.isMasterGenerateReport()) {
             generateReportLocal(stressTestReport, csvPath, reportPathDir);

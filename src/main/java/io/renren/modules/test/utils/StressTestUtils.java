@@ -37,7 +37,7 @@ public class StressTestUtils {
 	private static SysConfigService sysConfigService = (SysConfigService) SpringContextUtils.getBean("sysConfigService");
     public static String xslFilePath = "classpath:config/jmeter.results.zyanycall.xsl";
 
-    //0：初始状态  1：正在运行  2：成功执行  3：运行出现异常
+    //0：初始状态  1：正在运行  2：成功执行  3：运行出现异常  4：文件缺失
     public static final Integer INITIAL = 0;
     public static final Integer RUNNING = 1;
     public static final Integer RUN_SUCCESS = 2;

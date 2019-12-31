@@ -13,7 +13,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.quartz.CronTrigger;
+//import org.quartz.CronTrigger;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class ScheduleJobServiceImpl implements ScheduleJobService {
 	 */
 	@PostConstruct
 	public void init(){
-		List<ScheduleJobEntity> scheduleJobList = schedulerJobDao.queryList(new HashMap<>());
+		/* List<ScheduleJobEntity> scheduleJobList = schedulerJobDao.queryList(new HashMap<>());
 		for(ScheduleJobEntity scheduleJob : scheduleJobList){
 			CronTrigger cronTrigger = ScheduleUtils.getCronTrigger(scheduler, scheduleJob.getJobId());
             //如果不存在，则创建
@@ -40,7 +40,7 @@ public class ScheduleJobServiceImpl implements ScheduleJobService {
             }else {
                 ScheduleUtils.updateScheduleJob(scheduler, scheduleJob);
             }
-		}
+		} */
 	}
 	
 	@Override

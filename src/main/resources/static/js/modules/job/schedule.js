@@ -98,7 +98,7 @@ var vm = new Vue({
 			    data: JSON.stringify(vm.schedule),
 			    success: function(r){
 			    	if(r.code === 0){
-						alert('操作成功', function(){
+						alert(r.msg.length > 8 ? r.msg:'操作成功', function(){
 							vm.reload();
 						});
 					}else{
@@ -169,7 +169,7 @@ var vm = new Vue({
 				    data: JSON.stringify(jobIds),
 				    success: function(r){
 						if(r.code == 0){
-							alert('操作成功', function(){
+							alert(r.msg.length > 8 ? r.msg:'操作成功', function(){
 								vm.reload();
 							});
 						}else{
@@ -193,7 +193,7 @@ var vm = new Vue({
 				    data: JSON.stringify(jobIds),
 				    success: function(r){
 						if(r.code == 0){
-							alert('操作成功', function(){
+							alert(r.msg.length > 8 ? r.msg:'操作成功', function(){
 								vm.reload();
 							});
 						}else{

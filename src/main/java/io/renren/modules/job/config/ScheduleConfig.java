@@ -1,5 +1,6 @@
 package io.renren.modules.job.config;
 
+import io.renren.config.AppConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
@@ -21,7 +22,8 @@ public class ScheduleConfig {
     public SchedulerFactoryBean schedulerFactoryBean(DataSource dataSource) {
         SchedulerFactoryBean factory = new SchedulerFactoryBean();
         factory.setDataSource(dataSource);
-
+        AppConfig appConfig = new AppConfig();
+        String activeType = appConfig.getActiveType();
         //quartz参数
         Properties prop = new Properties();
         prop.put("org.quartz.scheduler.instanceName", "RenrenScheduler");
@@ -32,6 +34,7 @@ public class ScheduleConfig {
         prop.put("org.quartz.threadPool.threadPriority", "5");
         //JobStore配置
         prop.put("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX");
+        //prop.put("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.StdJDBCDelegate");
         //集群配置
         prop.put("org.quartz.jobStore.isClustered", "true");
         prop.put("org.quartz.jobStore.clusterCheckinInterval", "15000");
@@ -39,6 +42,7 @@ public class ScheduleConfig {
 
         prop.put("org.quartz.jobStore.misfireThreshold", "12000");
         prop.put("org.quartz.jobStore.tablePrefix", "QRTZ_");
+        //prop.put("org.quartz.jobStore.selectWithLockSQL", "SELECT * FROM {0}LOCKS WHERE SCHED_NAME = {1} AND LOCK_NAME = ? FOR UPDATE");
         factory.setQuartzProperties(prop);
 
         factory.setSchedulerName("RenrenScheduler");
@@ -46,9 +50,15 @@ public class ScheduleConfig {
         factory.setStartupDelay(30);
         factory.setApplicationContextSchedulerContextKey("applicationContextKey");
         //可选，QuartzScheduler 启动时更新己存在的Job，这样就不用每次修改targetObject后删除qrtz_job_details表对应记录了
-        factory.setOverwriteExistingJobs(true);
-        //设置自动启动，默认为true
-        factory.setAutoStartup(true);
+        if(activeType.equals("h2")){
+            //sprint boot 1.5比较老，与 Quartz + h2 的兼容性不好，所以关闭定时任务
+            factory.setOverwriteExistingJobs(false);
+            factory.setAutoStartup(false);
+        } else {
+            factory.setOverwriteExistingJobs(true);
+            //设置自动启动，默认为true
+            factory.setAutoStartup(true);
+        }
 
         return factory;
     }

@@ -1,5 +1,6 @@
 package io.renren.modules.job.controller;
 
+import io.renren.config.AppConfig;
 import io.renren.modules.job.entity.ScheduleJobEntity;
 import io.renren.modules.job.service.ScheduleJobService;
 import io.renren.common.utils.PageUtils;
@@ -26,6 +27,9 @@ import java.util.Map;
 public class ScheduleJobController {
 	@Autowired
 	private ScheduleJobService scheduleJobService;
+    // 从配置文件获取active
+	AppConfig appConfig = new AppConfig();
+	String activeType = appConfig.getActiveType();
 	
 	/**
 	 * 定时任务列表
@@ -61,6 +65,9 @@ public class ScheduleJobController {
 	@RequestMapping("/save")
 	@RequiresPermissions("sys:schedule:save")
 	public R save(@RequestBody ScheduleJobEntity scheduleJob){
+		if(activeType.equals("h2")){
+			return R.ok("h2数据库模式下不支持定时任务！");
+		}
 		ValidatorUtils.validateEntity(scheduleJob);
 		
 		scheduleJobService.save(scheduleJob);
@@ -75,6 +82,9 @@ public class ScheduleJobController {
 	@RequestMapping("/update")
 	@RequiresPermissions("sys:schedule:update")
 	public R update(@RequestBody ScheduleJobEntity scheduleJob){
+		if(activeType.equals("h2")){
+			return R.ok("h2数据库模式下不支持定时任务！");
+		}
 		ValidatorUtils.validateEntity(scheduleJob);
 				
 		scheduleJobService.update(scheduleJob);
@@ -101,6 +111,9 @@ public class ScheduleJobController {
 	@RequestMapping("/run")
 	@RequiresPermissions("sys:schedule:run")
 	public R run(@RequestBody Long[] jobIds){
+		if(activeType.equals("h2")){
+			return R.ok("h2数据库模式下不支持定时任务！");
+		}
 		scheduleJobService.run(jobIds);
 		
 		return R.ok();
@@ -125,6 +138,9 @@ public class ScheduleJobController {
 	@RequestMapping("/resume")
 	@RequiresPermissions("sys:schedule:resume")
 	public R resume(@RequestBody Long[] jobIds){
+		if(activeType.equals("h2")){
+			return R.ok("h2数据库模式下不支持定时任务！");
+		}
 		scheduleJobService.resume(jobIds);
 		
 		return R.ok();

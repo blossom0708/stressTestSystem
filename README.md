@@ -68,6 +68,7 @@ renren-fast
 - 创建数据库renren_fast，数据库编码为UTF-8
 - 执行doc/db.sql文件，初始化数据
 - 修改application-dev.yml，更新MySQL账号和密码
+  （或者application.yml配置h2，调用application-h2.yml配置，连接h2数据库）
 - 修改MySQL中sys_config表中Jmeter专属配置项，更新为本地地址
 - Eclipse、IDEA运行RenrenApplication.java，则可启动项目
 - 项目访问路径：http://localhost:8080/renren-fast
@@ -91,6 +92,25 @@ renren-fast
 - 通过tomcat的bin目录下的startup命令，启动tomcat
 - 访问tomcat路径，如：http://线下环境ip:8080
 - 账号密码：admin/admin
-<br> 
-**注意事项：**部署时请确保平台jmeter引擎版本、主节点版本、分布式节点版本保持一致（避免不同版本配置文件或生成的报告数据差异导致一些异常）
+
+ **配置参数**
+ 性能测试配置(全在数据库保存配置参数：系统管理->参数管理)
+ - Jmeter主节点路径，默认测试报告生成使用 jmeterHome: D:\software\apache-jmeter-4.0
+ - 存放用例的总目录，里面会细分文件存放用例及用例文件，用例保存路径 casePath: D:\E\stressTestCases
+ - Jmeter节点机需要在/etc/bashrc中配置JAVA_HOME，同时source /etc/bashrc生效
+ - 
+   ：如果配置了Jmeter脚本启动，则额外开启Jmeter进程运行测试用例脚本及分布式程序。
+   ：分布式程序可以取消ssl校验（jmeter4及以上版本要求）。
+   ：同时可以配置支持Jmeter+InfluxDB+Grafana的实时监控。
+   ：支持自带的ECharts实时监控。
+ - 如果没有配置Jmeter脚本启动，则使用web本身自带的Jmeter功能。  
+   ：MASTER_JMETER_USE_SCRIPT_KEY 默认是false，即使用web程序进程来启动Jmeter-master程序。
+ - 默认支持以进程方式生成测试报告，也支持以脚本方式生成测试报告
+   ：MASTER_JMETER_GENERATE_REPORT_KEY 为true表示由进程生成测试报告，支持并发生成
+ - SCRIPT_SCHEDULER_DURATION_KEY 为true 开启脚本限时执行，以免脚本忘记停止在后台一直压测
+ - JMETER_THREADGROUP_SET_KEY 默认为false
+   ：JMETER_THREADGROUP_SET_KEY为true则开启线程组管理功能，导入脚本时会往线程组配置库中也导入一份
+ 
+ **注意事项：**
+部署时请确保平台jmeter引擎版本、主节点版本、分布式节点版本保持一致（避免不同版本配置文件或生成的报告数据差异导致一些异常）
 <br> 

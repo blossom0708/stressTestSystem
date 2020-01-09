@@ -52,12 +52,12 @@ var vm = new Vue({
 		title: null,
 		schedule: {}
 	},
-    mounted() {
+    mounted: function () {
         if (this.q.beanName) {
             // 如果beanName不为空，说明是从脚本管理页面传入BeanName
-            this.$nextTick(() => {
+            this.$nextTick( function () {
                 // 加上延时避免 mounted 方法比页面加载早执行
-                setTimeout(() => {
+                setTimeout( function () {
                 //this.$refs.queryResult.click()
                 this.query()
             }, 100)

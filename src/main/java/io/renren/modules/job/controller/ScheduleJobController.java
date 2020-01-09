@@ -30,6 +30,7 @@ public class ScheduleJobController {
     // 从配置文件获取active
 	AppConfig appConfig = new AppConfig();
 	String activeType = appConfig.getActiveType();
+	String rMsg = activeType.equals("h2") ? "h2数据库连接暂不支持定时任务！" : null;
 	
 	/**
 	 * 定时任务列表
@@ -65,9 +66,7 @@ public class ScheduleJobController {
 	@RequestMapping("/save")
 	@RequiresPermissions("sys:schedule:save")
 	public R save(@RequestBody ScheduleJobEntity scheduleJob){
-		if(activeType.equals("h2")){
-			return R.ok("h2数据库模式下不支持定时任务！");
-		}
+		if(rMsg != null) return R.ok(rMsg);
 		ValidatorUtils.validateEntity(scheduleJob);
 		
 		scheduleJobService.save(scheduleJob);
@@ -82,9 +81,7 @@ public class ScheduleJobController {
 	@RequestMapping("/update")
 	@RequiresPermissions("sys:schedule:update")
 	public R update(@RequestBody ScheduleJobEntity scheduleJob){
-		if(activeType.equals("h2")){
-			return R.ok("h2数据库模式下不支持定时任务！");
-		}
+		if(rMsg != null) return R.ok(rMsg);
 		ValidatorUtils.validateEntity(scheduleJob);
 				
 		scheduleJobService.update(scheduleJob);
@@ -111,9 +108,7 @@ public class ScheduleJobController {
 	@RequestMapping("/run")
 	@RequiresPermissions("sys:schedule:run")
 	public R run(@RequestBody Long[] jobIds){
-		if(activeType.equals("h2")){
-			return R.ok("h2数据库模式下不支持定时任务！");
-		}
+		if(rMsg != null) return R.ok(rMsg);
 		scheduleJobService.run(jobIds);
 		
 		return R.ok();
@@ -138,9 +133,7 @@ public class ScheduleJobController {
 	@RequestMapping("/resume")
 	@RequiresPermissions("sys:schedule:resume")
 	public R resume(@RequestBody Long[] jobIds){
-		if(activeType.equals("h2")){
-			return R.ok("h2数据库模式下不支持定时任务！");
-		}
+		if(rMsg != null) return R.ok(rMsg);
 		scheduleJobService.resume(jobIds);
 		
 		return R.ok();

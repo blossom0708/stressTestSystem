@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -177,9 +178,10 @@ public class StressTestFileController {
         FileSystemResource fileResource = new FileSystemResource(stressTestFileService.getFilePath(stressTestFile));
 
         HttpHeaders headers = new HttpHeaders();
+        String fileNameUTF8 = new String(stressTestFile.getOriginName().getBytes(), StandardCharsets.ISO_8859_1);
         headers.add("Cache-Control", "no-cache,no-store,must-revalidate");
         headers.add("Content-Disposition",
-                "attachment;filename=" + stressTestFile.getOriginName());
+                "attachment;filename=" + fileNameUTF8);
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         headers.setContentType(MediaType.parseMediaType("application/octet-stream"));

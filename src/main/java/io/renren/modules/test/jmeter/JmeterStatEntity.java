@@ -13,7 +13,8 @@ import java.util.Map;
  */
 public class JmeterStatEntity {
 
-    private Long fileId;
+    @SuppressWarnings("unused")
+	private Long fileId;
 
     /**
      * key值是label，即每个请求的名称。
@@ -59,7 +60,7 @@ public class JmeterStatEntity {
      * slave分布式节点的线程数，master默认统计不到。
      */
     private Map<String, String> threadCountsMap = new HashMap<>();
-
+    
     /**
      * 统计请求总数的监控数据，返回每一个请求的总数量。
      */
@@ -117,7 +118,7 @@ public class JmeterStatEntity {
         if (statMap != null) {
             statMap.forEach((k, v) -> {
                 // throughputMap.put(k + "_Rps(OK)", String.format("%.2f", v.getRate()));
-                throughputMap.put(k + "_Rps(OK)", String.format("%.2f", v.getRate()));
+            	throughputMap.put(k + "_Tps(OK)", String.valueOf(v.getCountPerSecond()));
 
                 /* double howLongRunning = 0.0;
                 if (v.getRate() > -1e-6) {//double大于0
@@ -125,7 +126,7 @@ public class JmeterStatEntity {
                 }
                 double errorRps = ((double) v.getErrorCount() / howLongRunning) * 1000.0;
                 throughputMap.put(k + "_Rps(KO)", String.format("%.2f", errorRps)); */
-                throughputMap.put(k + "_Tps(KO)", String.valueOf(v.getErrorCountPerSecond()));
+            	throughputMap.put(k + "_Tps(KO)", String.valueOf(v.getErrorCountPerSecond()));
             });
         }
         return throughputMap;
@@ -138,7 +139,7 @@ public class JmeterStatEntity {
     public Map<String, String> getNetworkSentMap() {
         if (statMap != null) {
             for (String key : statMap.keySet()) {
-                LocalSamplingStatCalculator calculator = statMap.get(key);
+            	LocalSamplingStatCalculator calculator = statMap.get(key);
                 networkSentMap.put(key + "(Sent)", String.format("%.2f", calculator.getSentKBPerSecond()));
             }
         }
@@ -152,7 +153,7 @@ public class JmeterStatEntity {
     public Map<String, String> getNetworkReceiveMap() {
         if (statMap != null) {
             for (String key : statMap.keySet()) {
-                LocalSamplingStatCalculator calculator = statMap.get(key);
+            	LocalSamplingStatCalculator calculator = statMap.get(key);
                 networkReceiveMap.put(key + "(Received)", String.format("%.2f", calculator.getKBPerSecond()));
             }
         }
@@ -172,11 +173,11 @@ public class JmeterStatEntity {
         double successPercent = 1.0;
         if (statMap != null) {
             for (String key : statMap.keySet()) {
-                LocalSamplingStatCalculator calculator = statMap.get(key);
+            	LocalSamplingStatCalculator calculator = statMap.get(key);
                 totalCount += calculator.getCount();
             }
             for (String key : statMap.keySet()) {
-                LocalSamplingStatCalculator calculator = statMap.get(key);
+            	LocalSamplingStatCalculator calculator = statMap.get(key);
                 long errorCount = calculator.getErrorCount();
                 double errorPercent = Double.parseDouble(String.format("%.2f", ((double) errorCount / (double) totalCount)));
                 successPercentageMap.put(key + "_ErrorPercent", String.valueOf(errorPercent));
@@ -194,7 +195,7 @@ public class JmeterStatEntity {
     public Map<String, String> getErrorPercentageMap() {
         if (statMap != null) {
             for (String key : statMap.keySet()) {
-                LocalSamplingStatCalculator calculator = statMap.get(key);
+            	LocalSamplingStatCalculator calculator = statMap.get(key);
                 errorPercentageMap.put(key + "_ErrorPercent", String.format("%.2f", calculator.getErrorPercentage()));
             }
         }
@@ -207,7 +208,7 @@ public class JmeterStatEntity {
 
     public Map<String, String> getThreadCountsMap() {
         if (jmeterRunEntity != null) {
-            Map<String, Integer> threadsCountMap = jmeterRunEntity.getNumberOfActiveThreads();
+        	Map<String, Integer> threadsCountMap = jmeterRunEntity.getNumberOfActiveThreads();
             int active = threadsCountMap.get(JmeterRunEntity.ACTIVE_THREADS);
             int started = threadsCountMap.get(JmeterRunEntity.STARTED_THREADS);
             int finished = threadsCountMap.get(JmeterRunEntity.FINISHED_THREADS);
@@ -227,11 +228,11 @@ public class JmeterStatEntity {
     public void setThreadCountsMap(Map<String, String> threadCountsMap) {
         this.threadCountsMap = threadCountsMap;
     }
-
+    
     public Map<String, String> getTotalCountsMap() {
         if (statMap != null) {
             for (String key : statMap.keySet()) {
-                LocalSamplingStatCalculator calculator = statMap.get(key);
+            	LocalSamplingStatCalculator calculator = statMap.get(key);
                 long totalCount = calculator.getCount();
                 totalCountsMap.put(key + "_总请求数", String.valueOf(totalCount));
             }

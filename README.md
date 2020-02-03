@@ -23,6 +23,8 @@
 renren-fast
 ├─doc  项目SQL语句
 │
+│─lib  项目引用jar包
+│
 ├─common 公共模块
 │  ├─aspect 系统日志
 │  ├─exception 异常处理
@@ -58,9 +60,9 @@ renren-fast
 - 页面交互：Vue2.x 
 - 前端监控：ECharts 3.8
 - 压测内核：Apache JMeter 5.1.1
-- 脚本调用内核：Apache Commons Exec 1.3
 - 远程执行命令：Ganymed build210
 - 批量上传组件：bootstrap-fileinput v4.5.2
+- JVM内部缓存：Guava 18.0
 <br> 
 
  **本地部署**

@@ -16,11 +16,8 @@
             <if test="status != null">
                 `status` = #{status}
             </if>
-            <if test="slaveIds != null and slaveIds.size() >0">
-               and slave_id in
-                <foreach item="slaveId" index="index" collection="slaveIds"  open="(" separator="," close=")">
-                    #{slaveId}
-                </foreach>
+            <if test="slaveIds != null and slaveIds.trim() != ''">
+                and slave_id in ( ${slaveIds} )
             </if>
         </where>
         <if test="sidx != null and sidx.trim() != ''">

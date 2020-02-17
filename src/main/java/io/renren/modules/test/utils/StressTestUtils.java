@@ -1,4 +1,4 @@
-package io.renren.modules.test.utils;
+﻿package io.renren.modules.test.utils;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -149,7 +149,12 @@ public class StressTestUtils {
     public final static String JMETER_THREADGROUP_SET_KEY = "JMETER_THREADGROUP_SET_KEY";
 
     public static String getJmeterHome() {
-    	return sysConfigService.getValue(MASTER_JMETER_HOME_KEY);
+        String jmeterHome = sysConfigService.getValue(MASTER_JMETER_HOME_KEY);
+        // 通过符号~来表示user_home（操作系统用户目录，兼容Linux和Windows）
+        if(jmeterHome.substring(0,1).equals("~")) {
+            jmeterHome = jmeterHome.replace("~",System.getProperty("user.home"));
+        }
+    	return jmeterHome;
     }
 
     public String getCasePath() {

@@ -1,4 +1,4 @@
-﻿package io.renren.modules.test.utils;
+package io.renren.modules.test.utils;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -158,7 +158,11 @@ public class StressTestUtils {
     }
 
     public String getCasePath() {
-    	return sysConfigService.getValue(MASTER_JMETER_CASES_HOME_KEY);
+        String caseHome = sysConfigService.getValue(MASTER_JMETER_CASES_HOME_KEY);
+        if(caseHome.substring(0,1).equals("~")) {
+            caseHome = caseHome.replace("~",System.getProperty("user.home"));
+        }
+        return caseHome;
     }
 
     public boolean isUseJmeterScript() {

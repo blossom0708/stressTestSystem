@@ -6,6 +6,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * Created by zyanycall@gmail.com on 15:24.
@@ -197,5 +198,23 @@ public class StressTestSlaveEntity implements Serializable {
 
     public void setWeight(String weight) {
         this.weight = weight;
+    }
+
+    /**
+     * ip不相同，不为空
+     */
+    public StressTestSlaveEntity copySlaveEntity() {
+        StressTestSlaveEntity clone = new StressTestSlaveEntity();
+        clone.setSlaveName(this.getSlaveName());
+        clone.setIp(this.getIp() + new Random().nextInt(100));
+        clone.setJmeterPort(this.getJmeterPort());
+        clone.setUserName(this.getUserName());
+        clone.setPasswd(this.getPasswd());
+        clone.setSshPort(this.getSshPort());
+        clone.setHomeDir(this.getHomeDir());
+        clone.setStatus(this.getStatus());
+        clone.setWeight(this.getWeight());
+        clone.setSlaveId(this.getSlaveId());
+        return clone;
     }
 }

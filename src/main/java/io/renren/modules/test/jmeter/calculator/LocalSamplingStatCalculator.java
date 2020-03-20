@@ -20,9 +20,10 @@ import java.util.concurrent.TimeUnit;
 public class LocalSamplingStatCalculator {
     private final StatCalculatorLong calculator = new StatCalculatorLong();
 
-    // private double maxThroughput;
+//    private double maxThroughput;
 
     private long firstTime;
+    private long howLongRunning;
 
     private String label;
 
@@ -57,15 +58,15 @@ public class LocalSamplingStatCalculator {
                 .maximumSize(50) // 设置缓存的最大容量
                 .expireAfterAccess(30, TimeUnit.SECONDS) // 设置缓存在写入一分钟后失效
                 .concurrencyLevel(10) // 设置并发级别为10
-                // .recordStats() // 开启缓存统计
+//            .recordStats() // 开启缓存统计
                 .build();
         errorCountMap = CacheBuilder.newBuilder()
                 .maximumSize(50) // 设置缓存的最大容量
                 .expireAfterAccess(30, TimeUnit.SECONDS) // 设置缓存在写入一分钟后失效
                 .concurrencyLevel(10) // 设置并发级别为10
-                // .recordStats() // 开启缓存统计
+//            .recordStats() // 开启缓存统计
                 .build();
-        // maxThroughput = Double.MIN_VALUE;
+//        maxThroughput = Double.MIN_VALUE;
         currentSample = new Sample();
     }
 
@@ -94,6 +95,10 @@ public class LocalSamplingStatCalculator {
 
     public long getFirstTime() {
         return firstTime;
+    }
+
+    public long getHowLongRunning() {
+        return howLongRunning;
     }
 
     /**
@@ -192,10 +197,15 @@ public class LocalSamplingStatCalculator {
      * @return newly created sample with current statistics
      */
     public Sample addSample(SampleResult res) {
+        long rtime;
         long cmean;
+        long cstdv;
+        long cmedian;
+        long cpercent;
         long eCount;
         long endTime;
         double throughput;
+        boolean rbool;
         synchronized (calculator) {
             calculator.addValue(res.getTime(), res.getSampleCount());
             calculator.addBytes(res.getBytesAsLong());
@@ -204,47 +214,30 @@ public class LocalSamplingStatCalculator {
             eCount = getCurrentSample().getErrorCount();
             eCount += res.getErrorCount();
             endTime = getEndTime(res);
-            // howLongRunning = endTime - firstTime;
-            // throughput = ((double) calculator.getCount() / (double) howLongRunning) * 1000.0;
-            throughput = 0D;
+            howLongRunning = endTime - firstTime;
+            throughput = ((double) calculator.getCount() / (double) howLongRunning) * 1000.0;
+//            if (throughput > maxThroughput) {
+//                maxThroughput = throughput;
+//            }
 
-            // zyanycall add
-            if (endTime > 0L) {
-                long endTimeSec = endTime / 1000;
-                Long successCountThisSec = successCountMap.getIfPresent(endTimeSec);
-                if (Objects.isNull(successCountThisSec)) {
-                    successCountThisSec = 0L;
-                }
-                if (res.isSuccessful()) {
-                    successCountThisSec = successCountThisSec + 1L;
-                }
-
-                Long errorCountThisSec = errorCountMap.getIfPresent(endTimeSec);
-                if (Objects.isNull(errorCountThisSec)) {
-                    errorCountThisSec = 0L;
-                }
-                if (!res.isSuccessful()) {
-                    errorCountThisSec = errorCountThisSec + 1L;
-                }
-                successCountMap.put(endTimeSec, successCountThisSec);
-                errorCountMap.put(endTimeSec, errorCountThisSec);
-            }
-            if (endTime == 0L) {//异常情况，label会直接打出异常内容，这里就不再计算统计。
-            }
-            // zyanycall add end
-            cmean = (long) calculator.getMean();
+            rtime = res.getTime();
+            cmean = (long)calculator.getMean();
+            cstdv = (long)calculator.getStandardDeviation();
+            cmedian = calculator.getMedian().longValue();
+            cpercent = calculator.getPercentPoint( 0.500 ).longValue();
+// TODO cpercent is the same as cmedian here - why? and why pass it to "distributionLine"?
+            rbool = res.isSuccessful();
         }
 
         long count = calculator.getCount();
         Sample s =
-                new Sample(null, 0L, cmean, 0L, 0L,
-                        0L, throughput, eCount, true, count, endTime);
+                new Sample( null, rtime, cmean, cstdv, cmedian, cpercent, throughput, eCount, rbool, count, endTime );
         currentSample = s;
         return s;
     }
 
     public long getCountPerSecond() {
-        // 平均下来TPS的取值并非就延迟一秒，这里保证的是取的值是TPS。
+        // 不是说平均下来TPS的取值就延迟一秒，这里保证的是取的值是TPS。
         long timeSec = (System.currentTimeMillis() / 1000) - 1;
         Long successCountPerSec = successCountMap.getIfPresent(timeSec);
         if (Objects.isNull(successCountPerSec)) {
@@ -304,15 +297,15 @@ public class LocalSamplingStatCalculator {
      */
     @Override
     public String toString() {
-        /* StringBuilder mySB = new StringBuilder();
-
-        mySB.append("Samples: " + this.getCount() + "  ");
-        mySB.append("Avg: " + this.getMean() + "  ");
-        mySB.append("Min: " + this.getMin() + "  ");
-        mySB.append("Max: " + this.getMax() + "  ");
-        mySB.append("Error Rate: " + this.getErrorPercentage() + "  ");
-        mySB.append("Sample Rate: " + this.getRate());
-        return mySB.toString(); */
+//        StringBuilder mySB = new StringBuilder();
+//
+//        mySB.append("Samples: " + this.getCount() + "  ");
+//        mySB.append("Avg: " + this.getMean() + "  ");
+//        mySB.append("Min: " + this.getMin() + "  ");
+//        mySB.append("Max: " + this.getMax() + "  ");
+//        mySB.append("Error Rate: " + this.getErrorPercentage() + "  ");
+//        mySB.append("Sample Rate: " + this.getRate());
+//        return mySB.toString();
         return "";
     }
 
@@ -326,11 +319,50 @@ public class LocalSamplingStatCalculator {
     /**
      * @return Returns the maxThroughput.
      */
+//    public double getMaxThroughput() {
+//        return maxThroughput;
+//    }
+
+//    public Map<Number, Number[]> getDistribution() {
+//        return calculator.getDistribution();
+//    }
+
+//    public Number getPercentPoint(double percent) {
+//        return calculator.getPercentPoint(percent);
+//    }
     public long getCount() {
         return calculator.getCount();
     }
 
+//    public Number getMax() {
+//        return calculator.getMax();
+//    }
+
     public double getMean() {
         return calculator.getMean();
     }
+
+//    public Number getMeanAsNumber() {
+//        return Long.valueOf((long) calculator.getMean());
+//    }
+
+//    public Number getMedian() {
+//        return calculator.getMedian();
+//    }
+
+//    public Number getMin() {
+//        if (calculator.getMin().longValue() < 0) {
+//            return Long.valueOf(0);
+//        }
+//        return calculator.getMin();
+//    }
+
+//    public Number getPercentPoint(float percent) {
+//        return calculator.getPercentPoint(percent);
+//    }
+
+//    public double getStandardDeviation() {
+//        return calculator.getStandardDeviation();
+//    }
+
 }

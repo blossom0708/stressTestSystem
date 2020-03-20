@@ -1,6 +1,7 @@
 package io.renren.modules.test.controller;
 
 import io.renren.common.annotation.SysLog;
+import io.renren.common.exception.RRException;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.common.utils.R;
@@ -173,7 +174,7 @@ public class StressTestFileController {
      */
     @RequestMapping("/downloadFile/{fileId}")
     @RequiresPermissions("test:stress:fileDownLoad")
-    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable("fileId") Long fileId) throws IOException {
+    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable("fileId") Long fileId) {
         StressTestFileEntity stressTestFile = stressTestFileService.queryObject(fileId);
         FileSystemResource fileResource = new FileSystemResource(stressTestFileService.getFilePath(stressTestFile));
 
@@ -186,10 +187,14 @@ public class StressTestFileController {
         headers.add("Expires", "0");
         headers.setContentType(MediaType.parseMediaType("application/octet-stream"));
 
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentLength(fileResource.contentLength())
-                .body(new InputStreamResource(fileResource.getInputStream()));
+        try {
+            return ResponseEntity
+                    .ok()
+                    .headers(headers)
+                    .contentLength(fileResource.contentLength())
+                    .body(new InputStreamResource(fileResource.getInputStream()));
+        } catch (IOException e) {
+            throw new RRException("找不到到文件！文件或许被删除！");
+        }
     }
 }

@@ -166,12 +166,14 @@ public class StressTestSlaveServiceImpl implements StressTestSlaveService {
             }
             //首先创建目录，会遇到重复创建
             ssh2Util.runCommand("mkdir " + slave.getHomeDir() + "/bin/stressTestCases");
+            //让JAVA_HOME生效
+            ssh2Util.runCommand("source /etc/bashrc");
             //启动节点
             String enableResult = ssh2Util.runCommand(
                     "cd " + slave.getHomeDir() + "/bin/stressTestCases/" + "\n" +
                             "sh " + "../jmeter-server -Djava.rmi.server.hostname=" + slave.getIp());
 
-            logger.error(enableResult);
+            logger.error("启动节点" + slave.getIp() + "执行结果:" + enableResult);
 
             if (!enableResult.contains("remote") && !enableResult.contains("Using local port")) {
                 //Using local port 表示固定本地端口（默认jmeter-server的本地端口是动态的）

@@ -13,6 +13,9 @@
             <if test="caseId != null and caseId.trim() != ''">
                 case_id = #{caseId}
             </if>
+            <if test="fileId != null and fileId.trim() != ''">
+                file_id = #{fileId}
+            </if>
         </where>
         <choose>
             <when test="sidx != null and sidx.trim() != ''">

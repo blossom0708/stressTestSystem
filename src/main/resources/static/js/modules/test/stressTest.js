@@ -9,7 +9,7 @@ $(function () {
                     return "<a href='"+ baseURL  +"modules/test/stressTestFile.html?CaseID=" + row.caseId + "'>" + value + "</a>";
                 }
             },
-            {label: '添加时间', name: 'addTime', width: 90},
+            {label: '修改时间', name: 'updateTime', width: 90},
             {label: '项目', name: 'project', sortable: false, width: 80},
             {label: '模块', name: 'module', sortable: false, width: 80},
             {label: '操作人', name: 'operator', sortable: false, width: 60},

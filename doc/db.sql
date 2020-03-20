@@ -447,7 +447,7 @@ INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('4',
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('5', 'MASTER_JMETER_REPLACE_FILE_KEY', '1', '1', '0：同名文件禁止上传；1：同名文件上传覆盖（禁止上传第二个）；2：允许不同用例的同名文件（支持上传覆盖）；默认值1');
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('6', 'MASTER_JMETER_GENERATE_REPORT_KEY', 'true', '1', 'true:本地web程序进程生成测试报告，可以多线程并发生成。false:使用Jmeter_home中的命令生成测试报告。');
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('7', 'JMETER_THREADGROUP_SET_KEY', 'false', '1', 'true：开启线程组管理功能，上传脚本时线程组配置将入库管理，默认false。');
-INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('8', 'SCRIPT_SCHEDULER_DURATION_KEY', 'true', '1', 'true:脚本限时执行生效，具体时间由脚本单独配置，是默认值 false:取消脚本限时执行');
+INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('8', 'SCRIPT_SCHEDULER_DURATION_KEY', '14400', '1', '配置大于0:脚本限时执行生效，这里设置的是默认时间1小时；0或者不填:取消强制加入的脚本限时执行');
 
 -- 调试/接口测试报告文件表(smooth 20181205)
 CREATE TABLE `test_debug_case_reports` (

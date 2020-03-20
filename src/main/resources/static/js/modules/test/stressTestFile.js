@@ -517,7 +517,7 @@ function runOnce(fileIds,slaveIds) {
         postURL = "test/stressFile/runOnce/"+slaveIds;
     }
     $.get(baseURL + "test/stressSlave/list/enableTotal", function (r) {
-        if (slaveIds || r.total < 2){
+        if (slaveIds || r.total < 1){
             $.ajax({
                 type: "POST",
                 url: baseURL + postURL,
@@ -610,10 +610,15 @@ function startInterval(fileId) {
     timeTicket = setInterval(function () {
         $.get(baseURL + "test/stressFile/statInfo/" + fileId, function (r) {
             var responseTimeMap = r.statInfo.responseTimesMap;
+            var howLongRunningTime = r.statInfo.howLongRunningFormat;
             //拿其中的一个值尝试一下，没有则不刷新option了。
             // if (Object.keys(responseTimeMap).length  === 0) {
             //     return;
             // }
+
+            if (howLongRunningTime != "") {
+                $("#howLongRunningFormat").html(howLongRunningTime);
+            }
 
             // 如果不是正在执行，则不再刷新前端
             if (r.statInfo.runStatus !== 1) {
@@ -686,6 +691,8 @@ function clearEcharts() {
     errorPercentageEChart.setOption(optionLine, true);
     threadCountsEChart.setOption(optionLine, true);
     totalCountsEChart.setOption(optionPie, true);
+    // 脚本执行持续时间清空
+    $("#howLongRunningFormat").html("");
 }
 
 function getOptionLine(map, legendData, dataObj, areaStyle) {

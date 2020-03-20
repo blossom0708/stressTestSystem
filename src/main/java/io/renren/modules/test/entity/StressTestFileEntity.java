@@ -1,5 +1,6 @@
 package io.renren.modules.test.entity;
 
+import io.renren.modules.test.utils.StressTestUtils;
 import javax.validation.constraints.Min;
 import java.io.Serializable;
 import java.util.Date;
@@ -79,7 +80,7 @@ public class StressTestFileEntity implements Serializable {
     /**
      * 脚本最长定时执行多少秒，默认是4小时
      */
-    private Integer duration = 14400;
+    private Integer duration = StressTestUtils.getScriptSchedulerDuration();
 
     /**
      * 提交的用户
@@ -244,6 +245,14 @@ public class StressTestFileEntity implements Serializable {
 
     public Integer getDuration() {
         return duration;
+    }
+
+    public Integer getDuration(Integer durationDefault) {
+        if (duration > 0) {
+            return duration;
+        } else {
+            return durationDefault;
+        }
     }
 
     public void setDuration(Integer duration) {

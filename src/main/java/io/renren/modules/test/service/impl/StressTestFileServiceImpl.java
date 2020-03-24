@@ -961,10 +961,11 @@ public class StressTestFileServiceImpl implements StressTestFileService {
     public String getSlaveIPPort() {
         Map<String, Object> query = new HashMap<>();
         query.put("status", StressTestUtils.ENABLE);
-        if(getSlaveIds == null || 0 == getSlaveIds[0]){
-            // 0表示主节点压测
-            return "";
-        } else {
+        if(getSlaveIds != null) {
+            if(0 == getSlaveIds[0]){
+                // 0表示主节点压测
+                return "";
+            }
             query.put("slaveIds",StringUtils.join(getSlaveIds, ","));
         }
         List<StressTestSlaveEntity> stressTestSlaveList = stressTestSlaveDao.queryList(query);

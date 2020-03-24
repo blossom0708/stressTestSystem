@@ -11,7 +11,7 @@ server:
 spring:
     # 环境 dev|test|pro|h2 系统默认使用dev（h2专门针对h2数据库连接）
     profiles:
-        active: dev
+        active: h2
     # jackson时间格式化
     jackson:
         time-zone: GMT+8
@@ -65,3 +65,12 @@ renren:
         # 如果没有配置Jmeter脚本启动，则使用web本身自带的Jmeter功能。
         # 支持自带的ECharts实时监控。
         # 默认是false，即使用web程序进程来启动Jmeter-master程序。 useJmeterScript: false
+
+# 配置日志文件
+logging:
+    pattern:
+        file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+        console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+    file: ./logs/renren-fast.log
+    file.max-size: 10MB
+    file.max-history: 10

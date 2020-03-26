@@ -566,7 +566,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
             // 查找脚本文件所用到的所有的参数化文件的名称，当前只查找了CSVData参数化类型的。
             // 将其放入到内存中，为了脚本结束之后关闭这些参数化文件。
             // 后续可能还会有其他文件能得到引用（如文件下载的测试等等），可能还需要扩充此方法。
-            ArrayList<String> fileAliaList = new ArrayList<>();
+            HashSet<String> fileAliaList = new HashSet<>();
             for (HashTree lht : jmxTree.values()) {
                 fillFileAliaList(fileAliaList, lht);
             }
@@ -617,7 +617,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
      * 将当前脚本所用到的文件保存起来。
      * 目前已知的最常用的有CSVDataSet类型的。
      */
-    public ArrayList<String> fillFileAliaList(ArrayList<String> fileAliaList, HashTree hashTree) {
+    public HashSet<String> fillFileAliaList(HashSet<String> fileAliaList, HashTree hashTree) {
         for (Object os : hashTree.keySet()) {
             if (os instanceof CSVDataSet) {
                 // filename通过查看源码，没有发现有变化的地方，所以让其成为关键字。
@@ -625,6 +625,16 @@ public class StressTestFileServiceImpl implements StressTestFileService {
                 fileAliaList.add(filename);
             } else if (os instanceof ThreadGroup) {
                 fillFileAliaList(fileAliaList, hashTree.get(os));
+            }
+        }
+
+        for (Object os : hashTree.values()) {
+            if (os instanceof CSVDataSet) {
+                // filename通过查看源码，没有发现有变化的地方，所以让其成为关键字。
+                String filename = ((CSVDataSet) os).getPropertyAsString("filename");
+                fileAliaList.add(filename);
+            } else {
+                fillFileAliaList(fileAliaList, (HashTree) os);
             }
         }
         return fileAliaList;
@@ -655,6 +665,9 @@ public class StressTestFileServiceImpl implements StressTestFileService {
     @Override
     @Transactional
     public void stop(Long[] fileIds, boolean now) {
+        if (stressTestUtils.isUseJmeterScript()) {
+            throw new RRException("Jmeter脚本模式启动不支持单独停止，请使用全部停止！");
+        }
         Arrays.asList(fileIds).stream().forEach(fileId -> {
             stopSingle(fileId, now);
         });
@@ -666,20 +679,16 @@ public class StressTestFileServiceImpl implements StressTestFileService {
      */
     @Override
     public void stopSingle(Long fileId, boolean now) {
-        if (stressTestUtils.isUseJmeterScript()) {
-            throw new RRException("Jmeter脚本启动不支持单独停止，请使用全部停止！");
-        } else {
-            Map<Long, JmeterRunEntity> jMeterEntity4file = StressTestUtils.jMeterEntity4file;
-            if (!jMeterEntity4file.isEmpty()) {
-                jMeterEntity4file.forEach((fileIdRunning, jmeterRunEntity) -> {
-                    if (fileId.equals(fileIdRunning)) {  //找到要停止的脚本文件
-                        stopLocal(fileId, jmeterRunEntity, now);
-                    }
-                });
-            }
-
-            resetRunningStatus(jMeterEntity4file);
+        Map<Long, JmeterRunEntity> jMeterEntity4file = StressTestUtils.jMeterEntity4file;
+        if (!jMeterEntity4file.isEmpty()) {
+            jMeterEntity4file.forEach((fileIdRunning, jmeterRunEntity) -> {
+                if (fileId.equals(fileIdRunning)) {  //找到要停止的脚本文件
+                    stopLocal(fileId, jmeterRunEntity, now);
+                }
+            });
         }
+
+        resetRunningStatus(jMeterEntity4file);
     }
 
     /**
@@ -798,7 +807,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
     @Transactional
     public void stopAllNow(Long[] fileIds) {
         if (stressTestUtils.isUseJmeterScript()) {
-            throw new RRException("Jmeter脚本启动不支持单独停止，请使用全部停止！");
+            throw new RRException("Jmeter脚本模式启动不支持单独停止，请使用全部停止！");
         } else {
             Map<Long, JmeterRunEntity> jMeterEntity4file = StressTestUtils.jMeterEntity4file;
             for (Long fileId : fileIds) {

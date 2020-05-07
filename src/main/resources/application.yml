@@ -6,7 +6,7 @@ server:
         min-spare-threads: 30
     port: 8080
     connection-timeout: 5000
-    context-path: /renren-fast
+    context-path: /
 
 spring:
     # 环境 dev|test|pro|h2 系统默认使用dev（h2专门针对h2数据库连接）

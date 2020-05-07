@@ -73,9 +73,9 @@ renren-fast
   （或者application.yml配置h2，调用application-h2.yml配置，连接h2数据库）
 - 修改MySQL中sys_config表中Jmeter专属配置项，更新为本地地址
 - Eclipse、IDEA运行RenrenApplication.java，则可启动项目
-- 项目访问路径：http://localhost:8080/renren-fast
+- 项目访问路径：http://localhost:8080/
 - 账号密码：admin/admin
-- Swagger路径：http://localhost:8080/renren-fast/swagger/index.html
+- Swagger路径：http://localhost:8080/swagger/index.html
 
 **jar部署**
 - 修改application.yml，修改profiles，指定执行环境如线下环境pro

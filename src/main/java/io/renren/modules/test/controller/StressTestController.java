@@ -114,7 +114,7 @@ public class StressTestController {
                 for (StressTestFileEntity stressCaseFile : fileList) {
                     // 就算是不同用例下，也不允许上传同名文件。
                     if (stressTestUtils.ReplaceFileKey() != 2
-                            && Long.valueOf(caseId) != stressCaseFile.getCaseId()) {
+                            && !Long.valueOf(caseId).equals(stressCaseFile.getCaseId())) {
                         //throw new RRException("其他用例已经包含此同名文件！");
                     	return R.ok().put("error","其他用例已经包含此同名文件！");
                     }

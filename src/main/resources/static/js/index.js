@@ -108,6 +108,13 @@ var vm = new Vue({
                 shadeClose: false,
                 content: ['http://cdn.renren.io/donate.jpg', 'no']
             });
+        },
+        goback: function () {
+            if (window.frames[0].location.href.indexOf("content") > 0){
+                window.frames[0].location = baseURL + "modules/test/stressTestReports.html";
+            } else {
+                history.go(-1);
+            }
         }
 	},
 	created: function(){
@@ -122,7 +129,7 @@ var vm = new Vue({
 	}
 });
 
-
+var historyUrl=""; //如果是弹窗页面，让父窗体显示历史页面（上一个页面）
 
 function routerList(router, menuList){
 	for(var key in menuList){
@@ -132,7 +139,20 @@ function routerList(router, menuList){
 		}else if(menu.type == 1){
 			router.add('#'+menu.url, function() {
 				var url = window.location.hash;
-				
+                //判断是否弹新窗口显示(带$符号的链接表示弹窗)
+                if(url.indexOf("#$") == 0){
+                    if(url.indexOf("#$http") == 0){
+                        window.open(url.replace('#$',''));
+                    } else {
+                        window.open(baseURL + url.replace('#$',''));
+                    }
+
+                    if(historyUrl != "" && historyUrl.indexOf("#$") < 0){
+                        url = historyUrl;
+                    } else {
+                        url = "#main.html";
+                    }
+                }
 				//替换iframe的url
 			    vm.main = url.replace('#', '');
 			    
@@ -145,4 +165,5 @@ function routerList(router, menuList){
 			});
 		}
 	}
+    var historyUrl=window.location.hash;
 }

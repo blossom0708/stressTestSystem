@@ -18,9 +18,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import static io.renren.common.utils.ConfigConstant.OS_NAME_LC;
@@ -79,8 +81,8 @@ public class StressTestUtils {
     public static Cache<Long, Map<String, LocalSamplingStatCalculator>> samplingStatCalculator4File =
             CacheBuilder.newBuilder()
                     .maximumSize(5000) // 设置缓存的最大容量
-                    .expireAfterAccess(30, TimeUnit.MINUTES) // 设置缓存在写入一分钟后失效
-                    .concurrencyLevel(20) // 设置并发级别为10
+                    .expireAfterAccess(30, TimeUnit.MINUTES) // 设置缓存在写入30分钟后无读写则失效
+                    .concurrencyLevel(20) // 设置并发级别为20
                     // .recordStats() // 开启缓存统计
                     .build();
 
@@ -96,10 +98,46 @@ public class StressTestUtils {
      */
     public static Cache<String, String> jMeterStatuses = CacheBuilder.newBuilder()
             .maximumSize(5000) // 设置缓存的最大容量
-            .expireAfterAccess(30, TimeUnit.MINUTES) // 设置缓存在写入一分钟后失效
-            .concurrencyLevel(20) // 设置并发级别为10
+            .expireAfterAccess(30, TimeUnit.MINUTES) // 设置缓存在写入30分钟后无读写则失效
+            .concurrencyLevel(20) // 设置并发级别为20
             // .recordStats() // 开启缓存统计
             .build();
+
+    /**
+     * 主进程Master内保存的各个脚本报告所对应的脚本ID，主要用于多脚本分布式压测的监控数据分类收集。
+     */
+    public static Cache<String, Long> jMeterFileKey = CacheBuilder.newBuilder()
+            .maximumSize(5000) // 设置缓存的最大容量
+            .expireAfterAccess(60, TimeUnit.MINUTES) // 设置缓存在写入60分钟后无读写则失效
+            .concurrencyLevel(20) // 设置并发级别为20
+            // .recordStats() // 开启缓存统计
+            .build();
+    // 判断缓存中是否存在指定fileId的数据
+    public boolean isExistCacheFileId(Long fileId) {
+        ConcurrentMap<String, Long> map = jMeterFileKey.asMap();
+        Collection<Long> list = map.values();
+        for (Long cacheFileId : list) {
+            if(cacheFileId.equals(fileId)){
+                return true;
+            }
+        }
+        return false;
+    }
+    // 根据fileId清除掉部分jMeterFileKey
+    public void deleteCacheFileId(Long fileId) {
+        ConcurrentMap<String, Long> map = jMeterFileKey.asMap();
+        for(Map.Entry<String, Long> vo : map.entrySet()){
+            if(vo.getValue().equals(fileId)){
+                jMeterFileKey.invalidate(vo.getKey());
+                logger.info("Remove Cache FileId: " + vo.getValue());
+            }
+        }
+    }
+    // 统计jMeterFileKey大小
+    public static int countCacheJmeterRunFile() {
+        ConcurrentMap<String, Long> map = jMeterFileKey.asMap();
+        return map.size();
+    }
 
     /**
      * Jmeter在Master节点的绝对路径

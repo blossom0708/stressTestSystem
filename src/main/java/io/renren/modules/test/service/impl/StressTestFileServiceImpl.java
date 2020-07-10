@@ -490,6 +490,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
     /**
      * 本地执行Jmeter的脚本文件，采用Apache-Jmeter-Api来执行。
      */
+    @SuppressWarnings({ "deprecation", "static-access" })
     public void excuteJmeterRunLocal(StressTestFileEntity stressTestFile, StressTestReportsEntity stressTestReports, Map<String, File> map) throws RuntimeException {
         File jmxFile = map.get("jmxFile");
         File csvFile = map.get("csvFile");
@@ -525,6 +526,21 @@ public class StressTestFileServiceImpl implements StressTestFileService {
             // jmeter5 建议换用 JMeter.convertSubTree(jmxTree,false);
             JMeter.convertSubTree(jmxTree);
 
+            if (StringUtils.isNotEmpty(slaveStr)) { //分布式节点启动
+                if (stressTestUtils.countCacheJmeterRunFile() < 1 && StressTestUtils.checkExistRunningScript()) {
+                    //如果缓存中没有任何脚本ID，但是又监测到存在正在运行的脚本，那么这个脚本一定是主节点的脚本，就需要把这个事先运行的脚本也凑数成分布式的
+                    //用master和同个fileId表示，没有实际含义，只是为了给分布式运行脚本凑个数，等关闭脚本时会自动清除。
+                    stressTestUtils.jMeterFileKey.put("master", stressTestFile.getFileId());
+                }
+                // 将分布式启动的报告名称和脚本ID保存到缓存中（表示正在分布式运行的脚本）
+                stressTestUtils.jMeterFileKey.put(stressTestReports.getReportName(), stressTestFile.getFileId());
+            } else { //主节点启动
+                if(stressTestUtils.countCacheJmeterRunFile() > 0){
+                    // 如果已经有分布式运行的脚本，那么主节点运行的脚本也按分布式方式缓存脚本ID
+                    stressTestUtils.jMeterFileKey.put(stressTestReports.getReportName(), stressTestFile.getFileId());
+                }
+            }
+
             JmeterResultCollector jmeterResultCollector = null;
             // 如果不要监控也不要测试报告，则不加自定义的Collector到文件里，让性能最大化。
             if (StressTestUtils.NEED_REPORT.equals(stressTestFile.getReportStatus())
@@ -532,7 +548,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
                 // 添加收集观察监听程序。
                 // 具体情况的区分在其程序内做分别，原因是情况较多，父子类的实现不现实。
                 // 使用自定义的Collector，用于前端绘图的数据收集和日志收集等。
-                jmeterResultCollector = new JmeterResultCollector(stressTestFile);
+                jmeterResultCollector = new JmeterResultCollector(stressTestFile, stressTestReports);
                 
                 // 对调试模式的处理，让结果文件保存为xml格式
                 if (StressTestUtils.NEED_DEBUG.equals(stressTestFile.getDebugStatus())) {
@@ -730,7 +746,8 @@ public class StressTestFileServiceImpl implements StressTestFileService {
 
         // 需要将结果收集的部分干掉
         StressTestUtils.samplingStatCalculator4File.invalidate(fileId);
-
+        // 将缓存的部分fileId信息清除
+        stressTestUtils.deleteCacheFileId(fileId);
     }
 
     /**
@@ -775,6 +792,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
 
             // 对于全部停止，再次全部移除统计数据
             StressTestUtils.samplingStatCalculator4File.invalidateAll();
+            StressTestUtils.jMeterFileKey.invalidateAll();
 
             resetRunningStatus(jMeterEntity4file);
 
@@ -828,8 +846,11 @@ public class StressTestFileServiceImpl implements StressTestFileService {
 
     @Override
     public JmeterStatEntity getJmeterStatEntity(Long fileId) {
-        // 每次调用都是一个全新的对象。不过这个对象仅用于前端返回，直接可以垃圾回收掉。
-        if (StringUtils.isNotEmpty(getSlaveIPPort())) {
+        // 如果是分布式，非主节点运行，缓存中也找不到对应的脚本ID，则表示关联不到具体运行的脚本，就全新创建所有echart对象
+        // 不过这个对象仅用于前端返回，直接可以垃圾回收掉
+        if (StringUtils.isNotEmpty(getSlaveIPPort()) &&
+                stressTestUtils.jMeterFileKey.getIfPresent("master") == null &&
+                !stressTestUtils.isExistCacheFileId(fileId)) {
             return new JmeterStatEntity(fileId, 0L);
         }
         return new JmeterStatEntity(fileId, null);

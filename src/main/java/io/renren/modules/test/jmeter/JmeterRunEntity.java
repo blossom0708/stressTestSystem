@@ -149,7 +149,9 @@ public class JmeterRunEntity {
                 } else { // 分布式情况下，活跃的线程数和已经启动的线程数可能不一致。
                     // 原因是每次启动脚本时，started 和 finish 的线程数都会清零，后再启动。但是active不会这样。
                     // 如果我们强制关闭脚本，会让分布式节点的active有残留值。这并非bug。
-                    numberOfActiveThreads = JMeterContextService.getThreadCounts().activeThreads;
+                    //numberOfActiveThreads = JMeterContextService.getThreadCounts().activeThreads;
+                    //JMeterContextService 是jmeter私有类，无法重写，所以多脚本运行的线程数无法分开计算
+                    numberOfActiveThreads = JMeterContextService.getNumberOfThreads();
                     break;
                 }
             }

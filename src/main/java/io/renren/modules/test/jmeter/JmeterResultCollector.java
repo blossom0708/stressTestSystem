@@ -1,5 +1,6 @@
 package io.renren.modules.test.jmeter;
 
+import io.renren.modules.test.entity.StressTestReportsEntity;
 import io.renren.modules.test.jmeter.calculator.LocalSamplingStatCalculator;
 import io.renren.modules.test.entity.StressTestFileEntity;
 import io.renren.modules.test.utils.StressTestUtils;
@@ -8,6 +9,7 @@ import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleResult;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +17,7 @@ import java.util.Map;
  * Jmeter执行程序的结果收集类，Jmeter每次执行完都会调用到这里。
  * 相当于观察者模式的观察类，钩子程序。
  * Created by zyanycall@gmail.com on 17:51.
+ * Change by smooth00 on 2020-07-09 14:32.
  */
 public class JmeterResultCollector extends ResultCollector {
 
@@ -38,14 +41,20 @@ public class JmeterResultCollector extends ResultCollector {
     public JmeterResultCollector() {
     }
 
-    public JmeterResultCollector(StressTestFileEntity stressTestFile) {
+    public JmeterResultCollector(StressTestFileEntity stressTestFile, StressTestReportsEntity stressTestReports) {
         samplingStatCalculatorMap = new HashMap<>();
         this.stressTestFile = stressTestFile;
         if (StringUtils.isNotEmpty(stressTestFile.getSlaveStr())) {//分布式压测
             StressTestUtils.jMeterStatuses.put(SLAVE_NEED_REPORT, stressTestFile.getReportStatus().toString());
             StressTestUtils.jMeterStatuses.put(SLAVE_NEED_CHART, stressTestFile.getWebchartStatus().toString());
-            //对于分布式，不再按照脚本文件来区分前端监控，分布式压测不支持master同时压测多个脚本文件的前端区分监控。
-            StressTestUtils.samplingStatCalculator4File.put(0L, samplingStatCalculatorMap);
+            // 对于分布式，也按照脚本文件来区分前端监控，除非在cache中找不到指定的脚本ID
+            Long nowFileId = StressTestUtils.jMeterFileKey.getIfPresent(stressTestReports.getReportName());
+            if(nowFileId != null) {
+                StressTestUtils.samplingStatCalculator4File.put(nowFileId, samplingStatCalculatorMap);
+            } else {
+                // 对于分布式，如果缓存里找不到指定脚本ID，就不按脚本文件来区分前端监控，分布式压测不支持master同时压测多个脚本文件的前端区分监控。
+                StressTestUtils.samplingStatCalculator4File.put(0L, samplingStatCalculatorMap);
+            }
         } else {
             StressTestUtils.samplingStatCalculator4File.put(stressTestFile.getFileId(), samplingStatCalculatorMap);
         }
@@ -79,8 +88,14 @@ public class JmeterResultCollector extends ResultCollector {
             }
             if (StressTestUtils.NEED_WEB_CHART.toString().
                     equals(StressTestUtils.jMeterStatuses.getIfPresent(SLAVE_NEED_CHART))) {
-
-                samplingStatCalculatorMap = StressTestUtils.samplingStatCalculator4File.getIfPresent(0L);
+                String fileCasePath = new StressTestUtils().getCasePath().replace("/", File.separator) + File.separator;
+                String reportFileName = this.getFilename().substring(fileCasePath.length());
+                Long nowFileId = StressTestUtils.jMeterFileKey.getIfPresent(reportFileName);
+                if (nowFileId != null) {
+                    samplingStatCalculatorMap = StressTestUtils.samplingStatCalculator4File.getIfPresent(nowFileId);
+                } else {
+                    samplingStatCalculatorMap = StressTestUtils.samplingStatCalculator4File.getIfPresent(0L);
+                }
                 // 全部停止脚本后，samplingStatCalculator4File整个会被清空。
                 addSample(sampleEvent);
             }

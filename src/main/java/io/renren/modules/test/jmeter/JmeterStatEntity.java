@@ -81,10 +81,10 @@ public class JmeterStatEntity {
      * 对于分布式场景，取到的statMap是总的，即包含了所有脚本执行的label的数据。
      */
     public JmeterStatEntity(Long fileId, Long fileIdZero) {
-        if (fileIdZero != null) {// 分布式情况下
+        if (fileIdZero != null) {// 分布式并在cache中找不到运行的脚本ID情况
             this.fileId = fileIdZero;
             statMap = StressTestUtils.samplingStatCalculator4File.getIfPresent(fileIdZero);
-        } else {// 单机模式下
+        } else {// 单机模式下，或分布式并在cache中能找到运行的脚本ID
             this.fileId = fileId;
             statMap = StressTestUtils.samplingStatCalculator4File.getIfPresent(fileId);
         }
@@ -280,7 +280,11 @@ public class JmeterStatEntity {
                 //long howLongRunning = System.currentTimeMillis() - firstTime;
                 long howLongRunning = calculator.getHowLongRunning();
                 if (firstTime > 0L && howLongRunning > 0L) {
-                    return StressTestUtils.formatTime(howLongRunning);
+                    howLongRunningFormat = StressTestUtils.formatTime(howLongRunning);
+                    if(StressTestUtils.countCacheJmeterRunFile() > 1) {
+                        howLongRunningFormat += " 【注意：监测到后台正以分布式运行其他脚本，分布式运行线程数被累加统计！请关闭并行任务，或改成脚本命令压测模式(参数管理中设置)！】";
+                    }
+                    return howLongRunningFormat;
                 }
             }
         }

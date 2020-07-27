@@ -30,6 +30,8 @@ public class JmeterRunEntity {
 
     private List<JMeterEngine> engines = new LinkedList<>();
 
+    private RemoteThreadsListenerTest remoteThreadsListenerTest = null;
+
     /**
      * 脚本文件所使用的文件名的集合，例如"classinfo.txt"
      */
@@ -54,6 +56,14 @@ public class JmeterRunEntity {
      * 已经停止线程标识常量标签。
      */
     public final static String FINISHED_THREADS = "Finished";
+
+    /**
+     * 调用远程分布式节点的监听信息，以便统计线程数
+     */
+    public JmeterRunEntity(RemoteThreadsListenerTest remoteThreadsListenerTest) {
+        // TODO Auto-generated constructor stub
+        this.remoteThreadsListenerTest = remoteThreadsListenerTest;
+    }
 
     /**
      * 停止当前脚本的压力引擎。
@@ -149,9 +159,12 @@ public class JmeterRunEntity {
                 } else { // 分布式情况下，活跃的线程数和已经启动的线程数可能不一致。
                     // 原因是每次启动脚本时，started 和 finish 的线程数都会清零，后再启动。但是active不会这样。
                     // 如果我们强制关闭脚本，会让分布式节点的active有残留值。这并非bug。
-                    //numberOfActiveThreads = JMeterContextService.getThreadCounts().activeThreads;
-                    //JMeterContextService 是jmeter私有类，无法重写，所以多脚本运行的线程数无法分开计算
-                    numberOfActiveThreads = JMeterContextService.getNumberOfThreads();
+                    int nowThreadNumber = remoteThreadsListenerTest.getThreadNumber();
+                    if(nowThreadNumber > 0) {
+                        numberOfActiveThreads = remoteThreadsListenerTest.getThreadNumber();
+                    } else {
+                        numberOfActiveThreads = JMeterContextService.getThreadCounts().activeThreads;
+                    }
                     break;
                 }
             }

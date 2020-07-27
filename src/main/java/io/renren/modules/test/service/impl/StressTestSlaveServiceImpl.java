@@ -168,6 +168,7 @@ public class StressTestSlaveServiceImpl implements StressTestSlaveService {
             ssh2Util.runCommand("mkdir " + slave.getHomeDir() + "/bin/stressTestCases");
             //让JAVA_HOME生效
             ssh2Util.runCommand("source /etc/bashrc");
+            ssh2Util.runCommand("source ~/.bash_profile");
             //启动节点
             String enableResult = ssh2Util.runCommand(
                     "cd " + slave.getHomeDir() + "/bin/stressTestCases/" + "\n" +

@@ -10,6 +10,7 @@ import io.renren.modules.test.jmeter.JmeterListenToTest;
 import io.renren.modules.test.jmeter.JmeterResultCollector;
 import io.renren.modules.test.jmeter.JmeterRunEntity;
 import io.renren.modules.test.jmeter.JmeterStatEntity;
+import io.renren.modules.test.jmeter.RemoteThreadsListenerTest;
 import io.renren.modules.test.jmeter.engine.LocalStandardJMeterEngine;
 import io.renren.modules.test.jmeter.runner.LocalDistributedRunner;
 import io.renren.modules.test.service.StressTestFileService;
@@ -569,10 +570,12 @@ public class StressTestFileServiceImpl implements StressTestFileService {
             // Summariser uses this feature to compute correctly number of threads
             // when NON GUI mode is used
             jmxTree.add(jmxTree.getArray()[0], new RemoteThreadsListenerTestElement());
+            RemoteThreadsListenerTest remoteThreadsListenerTest = new RemoteThreadsListenerTest();
+            jmxTree.add(jmxTree.getArray()[0], remoteThreadsListenerTest);
 
             // 在内存中保留启动信息使用。
             List<JMeterEngine> engines = new LinkedList<>();
-            JmeterRunEntity jmeterRunEntity = new JmeterRunEntity();
+            JmeterRunEntity jmeterRunEntity = new JmeterRunEntity(remoteThreadsListenerTest);
             jmeterRunEntity.setStressTestFile(stressTestFile);
             jmeterRunEntity.setStressTestReports(stressTestReports);
             jmeterRunEntity.setJmeterResultCollector(jmeterResultCollector);

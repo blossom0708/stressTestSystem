@@ -282,7 +282,7 @@ public class JmeterStatEntity {
                 if (firstTime > 0L && howLongRunning > 0L) {
                     howLongRunningFormat = StressTestUtils.formatTime(howLongRunning);
                     if(StressTestUtils.countCacheJmeterRunFile() > 1) {
-                        howLongRunningFormat += " 【注意：监测到后台正以分布式运行其他脚本，分布式运行线程数被累加统计！请关闭并行任务，或改成脚本命令压测模式(参数管理中设置)！】";
+                        howLongRunningFormat += " 【注意：监测到后台正在分布式运行其他脚本，为了准确统计远程线程数，各节点需使用专用ApacheJMeter_core.jar，或用脚本命令压测模式(参数管理中设置)！】";
                     }
                     return howLongRunningFormat;
                 }

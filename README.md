@@ -118,6 +118,6 @@ renren-fast
 <br> 
 **友情提示：** 本平台支持script脚本命令压测和jmeter api压测两种模式，大家可以在配置中[系统管理->参数配置]中修改。
  - script命令压测模式：不支持ECharts实时监控，但支持配合grafana + influxdb实时监控，相当于是jmeter的non-gui模式；
- - jmeter api压测模式：支持ECharts实时监控，如果要多脚本分布式运行并监控，请在各节点替换专用的ApacheJMeter_core.jar包（否则远程节点线程数不准确），目前只做了jmeter5.1.1版的（https://download.csdn.net/download/smooth00/12665241）；
- - 如果想配合grafana + influxdb监控，需要注意后端监听器的配置，避免踩坑：https://smooth.blog.csdn.net/article/details/107558934。
+ - jmeter api压测模式：支持ECharts实时监控，如果要多脚本分布式运行并监控，请在各节点替换专用的ApacheJMeter_core.jar包（否则远程节点线程数不准确），目前只做了jmeter5.1.1版的以供下载 https://download.csdn.net/download/smooth00/12665241
+ - 如果想配合grafana + influxdb监控，需要注意后端监听器的配置，以免踩坑：https://smooth.blog.csdn.net/article/details/107558934
 <br> 

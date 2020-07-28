@@ -220,16 +220,29 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         // 肯定存在已有的用例信息
         stressTestDao.update(stressCase);
         stressTestUtils.saveFile(multipartFile, filePath);
-        // 对jmx脚本将线程组配置信息入库(默认不入库)
-        if(stressTestUtils.isGetThreadGroup() && filePath.substring(filePath.length()-3).equals("jmx")){
-        	try {
-        		//入库前清理已有配置项
-        		testStressThreadSetDao.deleteByFileId(stressTestFile.getFileId());
-    			testStressThreadSet.jmxSaveNodes(filePath, stressTestFile);
-    		} catch (DocumentException e) {
-    			// TODO Auto-generated catch block
-    			e.printStackTrace();
-    		}
+
+        if(filePath.substring(filePath.length()-3).equals("jmx")) {
+            if(stressTestUtils.isReplaceBackendListenerName()) {
+                try {
+                    //替换脚本文件当中的后端监听器名称（避免监听时名称冲突导致采集数据混乱）
+                    stressTestUtils.replaceFileStr(filePath, "testclass=\"BackendListener\" testname=\"(.*?)\"",
+                            stressTestFile.getOriginName().substring(0,stressTestFile.getOriginName().indexOf(".jmx")), true);
+                } catch (DocumentException | IOException ex) {
+                    // TODO Auto-generated catch block
+                    ex.printStackTrace();
+                }
+            }
+            // 对jmx脚本将线程组配置信息入库(默认不入库)
+            if(stressTestUtils.isGetThreadGroup()) {
+                try {
+                    //入库前清理已有配置项
+                    testStressThreadSetDao.deleteByFileId(stressTestFile.getFileId());
+                    testStressThreadSet.jmxSaveNodes(filePath, stressTestFile);
+                } catch (DocumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

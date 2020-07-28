@@ -541,6 +541,7 @@ INSERT INTO sys_config (id, key, value, status, remark) VALUES ('5', 'MASTER_JME
 INSERT INTO sys_config (id, key, value, status, remark) VALUES ('6', 'MASTER_JMETER_GENERATE_REPORT_KEY', 'true', '1', 'true:本地web程序进程生成测试报告，可以多线程并发生成。false:使用Jmeter_home中的命令生成测试报告。');
 INSERT INTO sys_config (id, key, value, status, remark) VALUES ('7', 'SCRIPT_SCHEDULER_DURATION_KEY', '14400', '1', '配置大于0:脚本限时执行生效，这里设置的是默认时间4小时；0或者不填:取消强制加入的脚本限时执行');
 INSERT INTO sys_config (id, key, value, status, remark) VALUES ('8', 'JMETER_THREADGROUP_SET_KEY', 'false', '1', 'true：开启线程组管理功能，上传脚本时线程组配置将入库管理，默认false。');
+INSERT INTO sys_config (id, key, value, status, remark) VALUES ('9', 'REPLACE_BACKENDLISTENER_NAME_KEY', 'false', '1', 'true：上传脚本时自动替换BackendListener后端监听器的名称（规则是原名称+脚本名称），默认false。');
 
 CREATE TABLE test_stress_thread_set (
   set_id varchar(40) NOT NULL,

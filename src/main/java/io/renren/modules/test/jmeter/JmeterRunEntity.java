@@ -161,7 +161,7 @@ public class JmeterRunEntity {
                     // 如果我们强制关闭脚本，会让分布式节点的active有残留值。这并非bug。
                     int nowThreadNumber = remoteThreadsListenerTest.getThreadNumber();
                     if(nowThreadNumber > 0) {
-                        numberOfActiveThreads = remoteThreadsListenerTest.getThreadNumber();
+                        numberOfActiveThreads = nowThreadNumber;
                     } else {
                         numberOfActiveThreads = JMeterContextService.getThreadCounts().activeThreads;
                     }

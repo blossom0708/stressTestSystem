@@ -16,6 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 
 import java.io.*;
 import java.util.Collection;
@@ -24,6 +29,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static io.renren.common.utils.ConfigConstant.OS_NAME_LC;
 
@@ -185,6 +192,11 @@ public class StressTestUtils {
      */
     public final static String JMETER_THREADGROUP_SET_KEY = "JMETER_THREADGROUP_SET_KEY";
 
+    /**
+     * 上传脚本时，是否修改后端监听器名称（避免不同脚本名称相当），默认是不修改false
+     */
+    public final static String REPLACE_BACKENDLISTENER_NAME_KEY = "REPLACE_BACKENDLISTENER_NAME_KEY";
+
     public static String getJmeterHome() {
         String jmeterHome = sysConfigService.getValue(MASTER_JMETER_HOME_KEY);
         // 通过符号~来表示user_home（操作系统用户目录，兼容Linux和Windows）
@@ -224,6 +236,10 @@ public class StressTestUtils {
             return true;
         }
         return false;
+    }
+
+    public boolean isReplaceBackendListenerName() {
+        return Boolean.parseBoolean(sysConfigService.getValue(REPLACE_BACKENDLISTENER_NAME_KEY));
     }
 
     public static Integer getScriptSchedulerDuration() {
@@ -330,6 +346,46 @@ public class StressTestUtils {
             multipartFile.transferTo(file);
         } catch (IOException e) {
             throw new RRException("保存文件异常失败", e);
+        }
+    }
+
+    /**
+     * 替换文件内容;主要是替换jmx脚本中的后端监听器名称（避免重名）
+     * @param filePath,文件路径
+     * @param regex,被替换内容正则表达式
+     * @param replaceStr,替换内容
+     * @param isAdd,是否追加的方式替换
+     * @throws DocumentException
+     * @throws IOException
+     */
+    public void replaceFileStr(String filePath, String regex, String replaceStr, boolean isAdd) throws DocumentException, IOException {
+        SAXReader reader = new SAXReader();
+        File file = new File(filePath);
+        Document document = reader.read(file);
+        String text = document.asXML();
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(text);
+        String oldStr = ""; //为了防止替换错误，将连同正则表达式内容一起替换
+        String newStr = "";
+        boolean isReplace = false;
+        while(matcher.find()) {
+            if(matcher.group(0).indexOf(replaceStr) < 0) {
+                oldStr = matcher.group(0);
+                if(isAdd) { //将要替换的内容作为后缀加入
+                    newStr = oldStr.replaceAll(matcher.group(1), matcher.group(1) + "-" + replaceStr);
+                } else {
+                    newStr = oldStr.replaceAll(matcher.group(1), replaceStr);
+                }
+                text = text.replaceAll(oldStr, newStr);
+                isReplace = true;
+            }
+        }
+        if(isReplace) {
+            document = DocumentHelper.parseText(text);
+            XMLWriter output = new XMLWriter(new FileWriter(file));
+            output.write(document);
+            output.close();
+            text = null;
         }
     }
 

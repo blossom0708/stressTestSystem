@@ -158,7 +158,7 @@ var vm = new Vue({
         showEdit: false,
         showTask: false,
         showSlave: false,
-        s_fileds: '',
+        s_fileIds: '',
         showCronManual: false,
         showCronGenerate: false
     },
@@ -440,8 +440,8 @@ var vm = new Vue({
                 }
             });
         },
-        getSlave: function (fileds) {
-            vm.s_fileds = fileds;
+        getSlave: function (fileIds) {
+            vm.s_fileIds = fileIds;
             $("#jqSlaveGrid").jqGrid({
                 url: baseURL + 'test/stressSlave/list/enable',
                 datatype: "json",
@@ -461,6 +461,15 @@ var vm = new Vue({
                                 return '<span class="label label-warning">变更中</span>';
                             } else if (value === 3) {
                                 return '<span class="label label-danger">异常</span>';
+                            }
+                        }
+                    },
+                    {
+                        label: '状况', name: 'runFileId', width: 80, formatter: function (value, options, row) {
+                            if (value === null) {
+                                return '<span class="label label-default">空闲</span>';
+                            } else if (value > 0) {
+                                return '<span class="label label-warning" title="脚本文件ID:'+value+'">正忙</span>';
                             }
                         }
                     },
@@ -490,9 +499,21 @@ var vm = new Vue({
                     //隐藏grid底部滚动条
                     $("#jqSlaveGrid").closest(".ui-jqgrid-bdiv").css({"overflow-x": "hidden"});
                 }
-            });
+            }).trigger("reloadGrid");
             vm.showList = false;
             vm.showSlave = true;
+        },
+        reloadSlave: function (event) {
+            vm.showChart = false;
+            vm.showList = false;
+            vm.showEdit = false;
+            vm.showTask = false;
+            vm.showSlave = true;
+            var page = $("#jqSlaveGrid").jqGrid('getGridParam', 'page');
+            $("#jqSlaveGrid").jqGrid('setGridParam', {
+                postData: {},
+                page: page
+            }).trigger("reloadGrid");
         },
         runOnceNow: function () {
             var grid = $("#jqSlaveGrid");
@@ -502,7 +523,7 @@ var vm = new Vue({
                 slaveIds = grid.getGridParam("selarrrow");
             }
 
-            runOnce(vm.s_fileds,slaveIds);
+            runOnce(vm.s_fileIds,slaveIds);
             vm.reload();
         }
     }
@@ -625,6 +646,12 @@ function startInterval(fileId) {
                 return;
             }
 
+            // 如果是分布式，则前端显示节点数
+            var slaveCount = r.statInfo.slaveCount;
+            if (slaveCount > 0) {
+                $("#slaveCountFormat").html("分布式节点数量：" + slaveCount);
+            }
+
             var throughputMap = r.statInfo.throughputMap;
             var networkSentMap = r.statInfo.networkSentMap;
             var networkReceiveMap = r.statInfo.networkReceiveMap;
@@ -693,6 +720,7 @@ function clearEcharts() {
     totalCountsEChart.setOption(optionPie, true);
     // 脚本执行持续时间清空
     $("#howLongRunningFormat").html("");
+    $("#slaveCountFormat").html("");
 }
 
 function getOptionLine(map, legendData, dataObj, areaStyle) {

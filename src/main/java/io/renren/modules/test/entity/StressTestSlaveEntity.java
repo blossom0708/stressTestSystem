@@ -1,7 +1,7 @@
 package io.renren.modules.test.entity;
 
 import org.hibernate.validator.constraints.NotBlank;
-
+import io.renren.modules.test.utils.StressTestUtils;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
@@ -86,6 +86,11 @@ public class StressTestSlaveEntity implements Serializable {
      * 更新的时间
      */
     private Date updateTime;
+
+    /**
+     * 分布式节点运行的脚本ID，通过缓存保存，不入库
+     */
+    private Long runFileId;
 
     public Long getSlaveId() {
         return slaveId;
@@ -198,6 +203,15 @@ public class StressTestSlaveEntity implements Serializable {
 
     public void setWeight(String weight) {
         this.weight = weight;
+    }
+
+    public Long getRunFileId() {
+        runFileId = StressTestUtils.jMeterSlaveKey.getIfPresent(slaveId);
+        return runFileId;
+    }
+
+    public void setRunFileId(Long fileId) {
+        StressTestUtils.jMeterSlaveKey.put(slaveId, fileId);
     }
 
     /**

@@ -421,6 +421,17 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         stressTestFile.setStatus(StressTestUtils.RUNNING);
         update(stressTestFile);
 
+        //将脚本所关联的分布式节点ID存入缓存，以便知道各节点的被使用状态
+        for (Long slaveId:getSlaveIds) {
+            StressTestSlaveEntity slaveEntity = stressTestSlaveDao.queryObject(slaveId);
+            if (Objects.isNull(slaveEntity)) {
+                // 为空不处理(一般为主节点)
+                continue;
+            } else {
+                slaveEntity.setRunFileId(fileId);
+            }
+        }
+
         if (stressTestReports != null) {
         	// 将调试测试报告放到调试的数据表中记录
             if (stressTestReports instanceof DebugTestReportsEntity) {
@@ -764,6 +775,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         StressTestUtils.samplingStatCalculator4File.invalidate(fileId);
         // 将缓存的部分fileId信息清除
         stressTestUtils.deleteCacheFileId(fileId);
+        stressTestUtils.deleteSlaveKeyByFileId(fileId);
     }
 
     /**
@@ -809,6 +821,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
             // 对于全部停止，再次全部移除统计数据
             StressTestUtils.samplingStatCalculator4File.invalidateAll();
             StressTestUtils.jMeterFileKey.invalidateAll();
+            StressTestUtils.jMeterSlaveKey.invalidateAll();
 
             resetRunningStatus(jMeterEntity4file);
 

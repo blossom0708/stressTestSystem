@@ -75,6 +75,11 @@ public class JmeterStatEntity {
      */
     private String howLongRunningFormat = "";
 
+    /**
+     * 当前分布式节点数量。
+     */
+    private Integer slaveCount = 0;
+
     private JmeterRunEntity jmeterRunEntity;
 
     /**
@@ -282,7 +287,7 @@ public class JmeterStatEntity {
                 if (firstTime > 0L && howLongRunning > 0L) {
                     howLongRunningFormat = StressTestUtils.formatTime(howLongRunning);
                     if(StressTestUtils.countCacheJmeterRunFile() > 1) {
-                        howLongRunningFormat += " 【注意：监测到后台正在分布式运行其他脚本，为了准确统计远程线程数，各节点需使用专用ApacheJMeter_core.jar，或用脚本命令压测模式(参数管理中设置)！】";
+                        howLongRunningFormat += " 【注意：监测到后台正在分布式运行别的脚本，要准确统计远程线程数，各节点需换专用ApacheJMeter_core.jar，或换脚本命令压测模式(参数管理中设置)！】";
                     }
                     return howLongRunningFormat;
                 }
@@ -293,5 +298,12 @@ public class JmeterStatEntity {
 
     public void setHowLongRunningFormat(String howLongRunningFormat) {
         this.howLongRunningFormat = howLongRunningFormat;
+    }
+
+    /**
+     * 分布节点数量
+     */
+    public int getSlaveCount() {
+        return StressTestUtils.countSlaveKeyByFileId(this.fileId);
     }
 }

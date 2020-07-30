@@ -103,7 +103,7 @@
         <div id="throughputChart"></div>
         <div class="panel-heading">单个请求失败率</div>
         <div id="errorPercentageChart"></div>
-        <div class="panel-heading">并发数信息</div>
+        <div class="panel-heading">并发数信息 &nbsp;&nbsp;<span id="slaveCountFormat"></span></div>
         <div id="threadCountsChart"></div>
         <div class="panel-heading">成功率和失败率</div>
         <div id="successPercentageChart"></div>
@@ -171,8 +171,9 @@
             </div>
             <a class="btn btn-default" >查询</a>
             <a v-if="hasPermission('test:stress')" class="btn btn-primary" @click="runOnceNow"><i class="fa fa-pencil-square-o"></i>&nbsp;确定</a>
+            &nbsp;&nbsp;<input type="button" class="btn btn-success" @click="reloadSlave" value="刷新"/>
             &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="取消"/>
-            <span>&nbsp;&nbsp;不选择直接确定则表示主节点压测</span>
+            <span>&nbsp;&nbsp;【不勾选直接<确定>则表示主节点压测】</span>
         </div>
         <table id="jqSlaveGrid"></table>
         <div id="jqSlaveGridPager"></div>

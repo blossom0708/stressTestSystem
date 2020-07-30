@@ -35,6 +35,8 @@ public class JmeterResultCollector extends ResultCollector {
 
     private Map<String, LocalSamplingStatCalculator> samplingStatCalculatorMap;
 
+    private String fileCasePath = new StressTestUtils().getCasePath().replace("/", File.separator) + File.separator;
+
     /**
      * 为分布式反射使用
      */
@@ -86,11 +88,14 @@ public class JmeterResultCollector extends ResultCollector {
                     equals(StressTestUtils.jMeterStatuses.getIfPresent(SLAVE_NEED_REPORT))) {
                 super.sampleOccurred(sampleEvent);
             }
+            String reportFileName = this.getFilename().substring(fileCasePath.length());
+            Long nowFileId = StressTestUtils.jMeterFileKey.getIfPresent(reportFileName);
+            if (nowFileId != null) {
+                //每次请求都刷新一下，避免缓存过期，表示slave节点一直占用中
+                StressTestUtils.refreshSlaveKeyByFileId(nowFileId);
+            }
             if (StressTestUtils.NEED_WEB_CHART.toString().
                     equals(StressTestUtils.jMeterStatuses.getIfPresent(SLAVE_NEED_CHART))) {
-                String fileCasePath = new StressTestUtils().getCasePath().replace("/", File.separator) + File.separator;
-                String reportFileName = this.getFilename().substring(fileCasePath.length());
-                Long nowFileId = StressTestUtils.jMeterFileKey.getIfPresent(reportFileName);
                 if (nowFileId != null) {
                     samplingStatCalculatorMap = StressTestUtils.samplingStatCalculator4File.getIfPresent(nowFileId);
                 } else {

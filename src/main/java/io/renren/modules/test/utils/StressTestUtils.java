@@ -26,6 +26,7 @@ import java.io.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -133,7 +134,7 @@ public class StressTestUtils {
     // 根据fileId清除掉部分jMeterFileKey
     public void deleteCacheFileId(Long fileId) {
         ConcurrentMap<String, Long> map = jMeterFileKey.asMap();
-        for(Map.Entry<String, Long> vo : map.entrySet()){
+        for(Entry<String, Long> vo : map.entrySet()){
             if(vo.getValue().equals(fileId)){
                 jMeterFileKey.invalidate(vo.getKey());
                 logger.info("Remove Cache FileId: " + vo.getValue());
@@ -144,6 +145,46 @@ public class StressTestUtils {
     public static int countCacheJmeterRunFile() {
         ConcurrentMap<String, Long> map = jMeterFileKey.asMap();
         return map.size();
+    }
+
+    /**
+     * Cache内保存的正在运行slave节点所对应的脚本ID，用于显示节点的使用状态。
+     */
+    public static Cache<Long, Long> jMeterSlaveKey = CacheBuilder.newBuilder()
+            .maximumSize(5000) // 设置缓存的最大容量
+            .expireAfterAccess(30, TimeUnit.MINUTES) // 设置缓存在写入30分钟后无读写则失效
+            .concurrencyLevel(20) // 设置并发级别为20
+            // .recordStats() // 开启缓存统计
+            .build();
+    // 根据fileId刷新jMeterSlaveKey访问
+    public static void refreshSlaveKeyByFileId(Long fileId) {
+        ConcurrentMap<Long, Long> map = jMeterSlaveKey.asMap();
+        for(Entry<Long, Long> vo : map.entrySet()){
+            if(vo.getValue().equals(fileId)){
+                jMeterSlaveKey.getIfPresent(vo.getKey());
+            }
+        }
+    }
+    // 根据fileId统计jMeterSlaveKey的数量
+    public static int countSlaveKeyByFileId(Long fileId) {
+        ConcurrentMap<Long, Long> map = jMeterSlaveKey.asMap();
+        int count = 0;
+        for(Entry<Long, Long> vo : map.entrySet()){
+            if(vo.getValue().equals(fileId)){
+                count++;
+            }
+        }
+        return count;
+    }
+    // 根据fileId清除掉部分jMeterSlaveKey
+    public void deleteSlaveKeyByFileId(Long fileId) {
+        ConcurrentMap<Long, Long> map = jMeterSlaveKey.asMap();
+        for(Entry<Long, Long> vo : map.entrySet()){
+            if(vo.getValue().equals(fileId)){
+                jMeterSlaveKey.invalidate(vo.getKey());
+                logger.info("Remove slave cache for fileId: " + vo.getValue());
+            }
+        }
     }
 
     /**

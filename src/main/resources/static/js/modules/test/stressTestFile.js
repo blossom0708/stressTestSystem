@@ -521,6 +521,14 @@ var vm = new Vue({
             var slaveIds = [0];
             if (rowKey) {
                 slaveIds = grid.getGridParam("selarrrow");
+                for(var i in slaveIds) {
+                    //判断节点是否正忙，忙的话禁止压测
+                    var retStr = grid.jqGrid('getRowData', slaveIds[i]).runFileId;
+                    if(retStr.indexOf("正忙") > -1) {
+                        alert("节点 " + grid.jqGrid('getRowData', slaveIds[i]).slaveName + " " + retStr);
+                        return;
+                    }
+                }
             }
 
             runOnce(vm.s_fileIds,slaveIds);

@@ -421,14 +421,16 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         stressTestFile.setStatus(StressTestUtils.RUNNING);
         update(stressTestFile);
 
-        //将脚本所关联的分布式节点ID存入缓存，以便知道各节点的被使用状态
-        for (Long slaveId:getSlaveIds) {
-            StressTestSlaveEntity slaveEntity = stressTestSlaveDao.queryObject(slaveId);
-            if (Objects.isNull(slaveEntity)) {
-                // 为空不处理(一般为主节点)
-                continue;
-            } else {
-                slaveEntity.setRunFileId(fileId);
+        if (getSlaveIds != null) {
+            //将脚本所关联的分布式节点ID存入缓存，以便知道各节点的被使用状态
+            for (Long slaveId:getSlaveIds) {
+                StressTestSlaveEntity slaveEntity = stressTestSlaveDao.queryObject(slaveId);
+                if (Objects.isNull(slaveEntity)) {
+                    // 为空不处理(一般为主节点)
+                    continue;
+                } else {
+                    slaveEntity.setRunFileId(fileId);
+                }
             }
         }
 

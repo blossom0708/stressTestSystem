@@ -182,7 +182,7 @@ var vm = new Vue({
             var viw = ['ftl','htm','html','jsp']; //页面
             var rol = ['js','css'];
             initFileInput('#files', baseURL + 'test/stress/upload?token=' + token,
-                img.concat(txt).concat(ott).concat(spe).concat(zat).concat(viw), {caseIds: caseId} );
+                img.concat(txt).concat(ott).concat(spe).concat(zat).concat(sin).concat(ein).concat(viw), {caseIds: caseId} );
         }
         // uploadFiles: function () {
         //     debugger

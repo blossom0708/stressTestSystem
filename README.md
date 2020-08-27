@@ -83,7 +83,7 @@ renren-fast
 - 通过maven命令打包jar包：mvn clean package -f pom.xml
 - 将target目录下，打包好的jar包通过java -jar renren-fast.jar 调用
 - 也可以将打好的jar包通过Dockerfile build到Docker镜像中
-- 项目访问路径，如：http://线下环境ip:8080/renren-fast
+- 项目访问路径，如：http://线下环境ip:8080/
 - 账号密码：admin/admin
 
  **tomcat部署**

@@ -8,7 +8,7 @@ $(function () {
                 label: '报告名称', name: 'originName', width: 70, sortable: false, formatter: function (value, options, row) {
                 if (row.status === 2) {
                     var reportDir = row.reportName.substring(0, row.reportName.lastIndexOf("."));
-                    return "<a href='" + baseURL + "testReport/" + reportDir + ".html'>" + value + "</a>";
+                    return "<a href='" + baseURL + "testReport/" + reportDir.replace(/\\/g,"/") + ".html'>" + value + "</a>";
                 } else {
                     return value;
                 }

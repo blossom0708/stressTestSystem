@@ -12,7 +12,7 @@ $(function () {
                 formatter: function (value, options, row) {
                     if (row.status === 2) {
                         var reportDir = row.reportName.substring(0, row.reportName.lastIndexOf("."));
-                        return "<a href='" + baseURL + "testReport/" + reportDir + "/index.html'>" + value + "</a>";
+                        return "<a href='" + baseURL + "testReport/" + reportDir.replace(/\\/g,"/") + "/index.html'>" + value + "</a>";
                     } else {
                         return value;
                     }

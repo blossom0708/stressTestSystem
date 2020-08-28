@@ -20,7 +20,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.io.XMLWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +65,27 @@ public class StressTestFileController {
     public R info(@PathVariable("fileId") Long fileId){
         StressTestFileEntity stressTestFile = stressTestFileService.queryObject(fileId);
         return R.ok().put("stressTestFile", stressTestFile);
+    }
+
+    /**
+     * 基于xml编辑器编辑Jmx脚本文件
+     */
+    @RequestMapping("/jmxEdit")
+    public R xmlSave(@RequestBody String jmxDoc, @RequestParam("fileName") String fileName){
+        try {
+            File file = new File(new StressTestUtils().getCasePath() + File.separator + fileName);
+            Document document = DocumentHelper.parseText(jmxDoc);
+            XMLWriter writer = new XMLWriter(new FileOutputStream(file));
+            writer.write(document);
+            writer.close();
+        } catch (DocumentException | UnsupportedEncodingException | FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return R.ok();
     }
 
     /**

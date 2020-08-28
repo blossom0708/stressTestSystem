@@ -109,6 +109,8 @@ $(function () {
                             btn = "<a href='#' class='btn btn-danger' onclick='stopOnce(" + row.fileId + ")' ><i class='fa fa-stop-circle'></i>&nbsp;停止</a>";
                         } else {
                             btn = "<a href='#' class='btn btn-primary' onclick='runOnce(" + row.fileId + ")' ><i class='fa fa-arrow-circle-right'></i>&nbsp;启动</a>";
+                            btn += "&nbsp;<a href='" + baseURL + "plugins/jmxedit/jmxEdit.html?jmxFile=" + encodeURIComponent(row.fileName) +"&jmxName=" +
+                                row.originName +"' class='btn btn-primary' ><i class='fa fa-pencil-square-o'></i>&nbsp;编辑</a>";
                         }
                     }
                     // var stopBtn = "<a href='#' class='btn btn-primary' onclick='stop(" + row.fileId + ")' ><i class='fa fa-stop'></i>&nbsp;停止</a>";

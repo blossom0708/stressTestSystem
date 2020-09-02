@@ -304,6 +304,7 @@
 		}
 	},
 	"ResultCollector"	: { "edit" : { "view": false, "processChildren": false } },
+	"ProxyControl"	    : { "edit" : { "view": false, "processChildren": false } },
 	"elementProp"		: { "edit" : { "view": false, "processChildren": true } },
 	"objectProp"		: { "edit" : { "view": false, "processChildren": true } },
 	"collectionProp"	: { "edit" : { "view": false, "processChildren": true } },

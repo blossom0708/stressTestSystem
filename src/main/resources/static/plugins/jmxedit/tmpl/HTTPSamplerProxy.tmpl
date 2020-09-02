@@ -56,8 +56,29 @@
 			</div>
 			<div class="strProp" style="display:<%=(postBodyRaw !=true ? "none" : "block")%>;">
 				<div><strong>User Defined Variables - HTTPSampler.postBody</strong></div>
+                <%
+                 function getByteLen(val) {
+                     var len = 0;
+                     for (var i = 0; i < val.length; i++) {
+                        var patt = new RegExp(/[^\x00-\xff]/ig);
+                        var a = val[i];
+                        if (patt.test(a))
+                        {
+                             len += 2;
+                        } else {
+                             len += 1;
+                        }
+                     }
+                      return len;
+                 }
+                 var valueRows = argumentValue.split(/\r?\n/).length + 1;
+                 var diviRows = parseInt(getByteLen(argumentValue) / 162) + 1;
+                 if (diviRows > valueRows) {
+                       valueRows = diviRows;
+                 }
+                %>
 				<span>
-					<textarea name="argumentValue" class="textarea-inherit" rows="<%=((postBodyRaw == true && argumentValue.split(/\r?\n/).length < 7) ? argumentValue.split(/\r?\n/).length + 1 : 7)%>" cols="60"><%=argumentValue.replace(/"/g,"'")%></textarea>
+					<textarea name="argumentValue" class="textarea-inherit" rows="<%=((postBodyRaw == true && valueRows < 7) ? valueRows : 7)%>" cols="60"><%=argumentValue.replace(/"/g,"'")%></textarea>
 				</span>	
 			</div>
 			<div class="strProp" style="display:<%=(fileArgXML.replace(/(^\s*)|(\s*$)/g,'').length < 20 ? "none" : "block")%>;">

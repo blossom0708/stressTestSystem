@@ -32,22 +32,6 @@
 	    if(r!=null) return decodeURIComponent(r[2]);
 	    return null;
 	}
-	// 线程组循环控制器专用，勿动
-	function changeLoops(value,objText) {
-		if("-1" == value){
-			objText.value=objText.value.replace(/stringProp/g, "intProp");
-		}else{
-			objText.value=objText.value.replace(/intProp/g, "stringProp");
-		}
-		var oldStr = objText.value.match(/name\='LoopController.loops'\>(\S*)\</);
-		var newStr = "name='LoopController.loops'>" + value + "<";
-		objText.value=objText.value.replace(oldStr[0],newStr);
-		if(oldStr[1] != value) {
-			var evt = document.createEvent('HTMLEvents');
-			evt.initEvent('change', false, true);
-			objText.dispatchEvent(evt);
-		}
-	}
 	</script>
 	<link rel="stylesheet" type="text/css" href="res/jmx.js.css"></link>
 	<link rel="stylesheet" type="text/css" href="res/demo.css"></link>

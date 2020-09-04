@@ -31,7 +31,7 @@
 				</div>
 			</div>
 			<div>
-				<span>Loop Count:</span> <input type="checkbox" value="" <%=(contForever==-1 ? "checked" : "")%> onclick="if(this.checked){loopsText.value=-1;loopsText.disabled=true;changeLoops(-1, loopController);} else {loopsText.disabled=false;}" ></input> <span>Forever</span>
+				<span>Loop Count:</span> <input type="checkbox" name="contForever" value="" <%=(contForever==-1 ? "checked" : "")%> onclick="if(this.checked){loopsText.value=-1;loopsText.disabled=true;changeLoops(-1, loopController);} else {loopsText.disabled=false;}" ></input> <span>Forever</span>
 				<input id="loopsText" type="textbox" name="loops" value="<%=loops%>" <%=(contForever==-1 ? "disabled=true" : "")%> onBlur="changeLoops(this.value, loopController)"></input>
 			</div>
 			<textarea id="loopController" class="textarea-inherit" style="display:none" cols="100" rows="4" name="loopContrXML"><%=loopContrXML.replace(/"/g,"'")%></textarea>

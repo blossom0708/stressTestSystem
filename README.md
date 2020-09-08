@@ -95,6 +95,9 @@ renren-fast
 - 访问tomcat路径，如：http://线下环境ip:8080
 - 账号密码：admin/admin
 
+ **Docker部署**
+  - 参见 https://gitee.com/smooth00/stressTestSystemDocker
+
  **配置参数**
  性能测试配置(全在数据库保存配置参数：系统管理->参数管理)
  - Jmeter主节点路径，默认测试报告生成使用 jmeterHome: D:\software\apache-jmeter-4.0

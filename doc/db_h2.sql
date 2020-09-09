@@ -527,7 +527,7 @@ CREATE TABLE test_stress_slave (
   update_time timestamp NOT NULL  AS CURRENT_TIMESTAMP ,
   update_by bigint(20) ,
   PRIMARY KEY (slave_id),
-  UNIQUE INDEX (ip)
+  UNIQUE INDEX ip_port (ip,jmeter_port)
 );
 
 -- 让本机master配置后也可以参与性能测试，默认是禁用master主节点

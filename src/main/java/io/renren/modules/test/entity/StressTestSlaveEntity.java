@@ -211,7 +211,9 @@ public class StressTestSlaveEntity implements Serializable {
     }
 
     public void setRunFileId(Long fileId) {
-        StressTestUtils.jMeterSlaveKey.put(slaveId, fileId);
+        if(fileId != null) {
+            StressTestUtils.jMeterSlaveKey.put(slaveId, fileId);
+        }
     }
 
     /**

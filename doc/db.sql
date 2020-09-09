@@ -434,7 +434,7 @@ CREATE TABLE `test_stress_slave` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   `update_by` bigint(20) COMMENT '修改用户id',
   PRIMARY KEY (`slave_id`),
-  UNIQUE INDEX (`ip`)
+  UNIQUE INDEX ip_port (`ip`, `jmeter_port`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='性能测试分布式节点表';
 
 -- 让本机master配置后也可以参与性能测试，默认是禁用master主节点
@@ -483,8 +483,5 @@ CREATE TABLE `test_stress_thread_set` (
 
 INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('36', '31', '调试报告管理', 'modules/test/debugTestReports.html', 'test:debug', '1', 'fa fa-area-chart', '4');
 
--- 脚本线程组管理（smooth 20190402）
---INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('37', '31', '脚本线程组管理', 'modules/test/stressThreadSet.html', 'test:teststressthreadset', '1', 'fa fa-clipboard', '6');
---INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('38', '37', '修改', NULL, 'test:teststressthreadset:update,test:teststressthreadset:select', '2', NULL, '0');
 -- Grafana监控视图
 INSERT INTO `sys_menu` (`menu_id`, `parent_id`, `name`, `url`, `perms`, `type`, `icon`, `order_num`) VALUES ('39', '31', 'Grafana监控视图', 'http://127.0.0.1:3000', NULL, '1', 'fa fa-clipboard', '7');

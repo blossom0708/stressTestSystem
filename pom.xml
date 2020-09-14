@@ -39,6 +39,7 @@
         <jmeter.websocket.version>1.2.2</jmeter.websocket.version>
         <jetty.version>9.4.12.RC2</jetty.version>
         <jmeter.plugins.version>1.4.0</jmeter.plugins.version>
+        <jmeter.dubbo.version>2.7.8</jmeter.dubbo.version>
 
         <!--wagon plugin 配置-->
         <service-path>/work/renren</service-path>
@@ -189,7 +190,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <!--性能测试-->
         <dependency>
             <groupId>org.apache.jmeter</groupId>
@@ -306,6 +306,11 @@
             <groupId>kg.apc</groupId>
             <artifactId>jmeter-plugins-standard</artifactId>
             <version>${jmeter.plugins.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.metersphere</groupId>
+            <artifactId>jmeter-plugins-dubbo</artifactId>
+            <version>${jmeter.dubbo.version}</version>
         </dependency>
     </dependencies>
     <build>

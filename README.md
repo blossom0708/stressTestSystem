@@ -96,7 +96,8 @@ renren-fast
 - 账号密码：admin/admin
 
  **Docker部署**
-  - 参见 https://gitee.com/smooth00/stressTestSystemDocker
+  - 部署方案参见 https://gitee.com/smooth00/stressTestSystemDocker
+  - Docker镜像见 https://registry.hub.docker.com/u/smooth00
 
  **配置参数**
  性能测试配置(全在数据库保存配置参数：系统管理->参数管理)

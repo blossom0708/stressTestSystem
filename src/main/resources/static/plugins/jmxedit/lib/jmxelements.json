@@ -64,6 +64,23 @@
 			}
 		}
 	},
+	"com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup" : {
+		"edit" : {
+			"attrs":{
+				"elementName"		: { "path" : "@testname"  },		
+				"elementType" 		: { "path" : "name()"  },
+				"elementEnabled" 	: { "path" : "@enabled" ,"type" : "boolean" },
+				"onSampleError"		: { "path" : "stringProp[@name='ThreadGroup.on_sample_error']" },
+				"TargetLevel"		: { "path" : "stringProp[@name='TargetLevel']" , 					"type" : "number"},
+				"RampUp"			: { "path" : "stringProp[@name='RampUp']" , 						"type" : "number"},
+				"Steps"	    		: { "path" : "stringProp[@name='Steps']" , 						    "type" : "number"},
+				"Hold"	    		: { "path" : "stringProp[@name='Hold']" , 						    "type" : "number"},
+				"LogFilename"	    : { "path" : "stringProp[@name='LogFilename']" },
+				"Iterations"	    : { "path" : "stringProp[@name='Iterations']" ,						"type" : "number"},
+				"Unit"				: { "path" : "stringProp[@name='Unit']" }
+			}
+		}
+	},
 	"CookieManager"	: {
 		"edit" : {
 			"attrs": {

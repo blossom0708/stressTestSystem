@@ -6,7 +6,7 @@
 	<form>
 		<div class="headline">
 			<img src="res/thread.gif"/>
-			<span class="jmxType">SteppingThreadGroup</span>
+			<span class="jmxType">ConcurrencyThreadGroup</span>
 			<span class="label">Name</span> <input type="textbox" name="elementName" value="<%=elementName%>"></input>
 			<span> <input type="checkbox" value="" name="elementEnabled" <%=(elementEnabled==true ? "checked" : "")%> ></input></span>
 			<span class="toggle toggleAttrs"> ... </span>
@@ -24,31 +24,27 @@
 			<div>
 				<div><strong>Thread Properties</strong></div>
 				<div class="strProp">
-					<span class="label">Number of Threads(users)</span> <input type="textbox" name="numThreads" value="<%=numThreads%>"></input>
+					<span class="label">Target Concurrency:</span> <input type="textbox" name="TargetLevel" value="<%=(TargetLevel > 0 ? TargetLevel : "" )%>"></input>
 				</div>
 				<div class="strProp">
-					<span class="label">Threads initial delay</span> <input type="textbox" name="threadsInitialDelay" value="<%=threadsInitialDelay%>"></input>
+					<span class="label">Ramp Up Time (<span id="timeTypeShow1"><%=(Unit=='S'? "sec" : "min" )%></span>):</span> <input type="textbox" name="RampUp" value="<%=(RampUp > 0 ? RampUp : "" )%>"></input>
 				</div>
 				<div class="strProp">
-					<span class="label">Start users count</span> <input type="textbox" name="startUsersCount" value="<%=startUsersCount%>"></input>
+					<span class="label">Ramp-Up Steps Count:</span> <input type="textbox" name="Steps" value="<%=(Steps > 0 ? Steps : "" )%>"></input>
 				</div>
 				<div class="strProp">
-					<span class="label">Start users count burst</span> <input type="textbox" name="startUsersCountBurst" value="<%=startUsersCountBurst%>"></input>
+					<span class="label">Hold Target Rate Time (<span id="timeTypeShow2"><%=(Unit=='S'? "sec" : "min" )%></span>)</span> <input type="textbox" name="Hold" value="<%=(Hold > 0 ? Hold : "" )%>"></input>
 				</div>
 				<div class="strProp">
-					<span class="label">Start users period</span> <input type="textbox" name="startUsersPeriod" value="<%=startUsersPeriod%>"></input>
+					<span class="label">Time Unit:</span> 
+					<input type="radio" name="Unit" value="M" <%=(Unit=='M'? "checked" : "" )%> onclick="if(this.checked){var timeUnitText = this.nextSibling.nodeValue.substring(0,3);timeTypeShow1.innerHTML = timeUnitText;timeTypeShow2.innerHTML = timeUnitText;}" >minutes
+					<input type="radio" name="Unit" value="S" <%=(Unit=='S'? "checked" : "" )%> onclick="if(this.checked){var timeUnitText = this.nextSibling.nodeValue.substring(0,3);timeTypeShow1.innerHTML = timeUnitText;timeTypeShow2.innerHTML = timeUnitText;}" >seconds
 				</div>
 				<div class="strProp">
-					<span class="label">Stop users count</span> <input type="textbox" name="stopUsersCount" value="<%=stopUsersCount%>"></input>
+					<span class="label">Thread Iterations Limit:</span> <input type="textbox" name="Iterations" value="<%=(Iterations > 0 ? Iterations : "" )%>"></input>
 				</div>
 				<div class="strProp">
-					<span class="label">Stop users period</span> <input type="textbox" name="stopUsersPeriod" value="<%=stopUsersPeriod%>"></input>
-				</div>
-				<div class="strProp">
-					<span class="label">flighttime</span> <input type="textbox" name="flighttime" value="<%=flighttime%>"></input>
-				</div>
-				<div class="strProp">
-					<span class="label">rampUp</span> <input type="textbox" name="rampUp" value="<%=rampUp%>"></input>
+					<span class="label">Log Threads Status into File:</span> <input type="textbox" name="LogFilename" value="<%=LogFilename%>"></input>
 				</div>
 			</div>
 

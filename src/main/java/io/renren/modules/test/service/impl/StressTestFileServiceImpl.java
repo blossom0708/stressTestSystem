@@ -461,7 +461,7 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         // 所以调试模式下如果运行脚本则无法生成测试报告，造成系统功能缺失。
         // 为避免后续问题，jmx如果使用了调试，则无法使用脚本方式运行。
         if (StressTestUtils.NEED_DEBUG.equals(stressTestFile.getDebugStatus())) {
-            throw new RRException("不支持在分布式slave节点调试，请关闭调试模式！");
+            throw new RRException("不支持在脚本模式下调试，请关闭调试模式！");
         }
     	
     	String jmeterHomeBin = stressTestUtils.getJmeterHomeBin();

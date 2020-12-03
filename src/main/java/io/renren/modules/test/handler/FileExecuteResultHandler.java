@@ -45,6 +45,10 @@ public class FileExecuteResultHandler extends FileResultHandler {
         stressTestFileService.update(stressTestFile, stressTestReports);
         super.onProcessComplete(exitValue);
         //保存状态，执行完毕
+        if(new StressTestUtils().isUseJmeterScript()) {
+            // 清空节点关联脚本的缓存数据，让节点状态置为空闲
+            StressTestUtils.jMeterSlaveKey.invalidateAll();
+        }
     }
 
     /**

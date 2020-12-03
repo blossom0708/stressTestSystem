@@ -806,6 +806,8 @@ public class StressTestFileServiceImpl implements StressTestFileService {
                 FileResultHandler resultHandler = new FileStopResultHandler(this, outputStream, errorStream);
                 // 执行脚本命令
                 executor.execute(cmdLine, resultHandler);
+                // 清空节点关联脚本的缓存数据，让节点状态置为空闲
+                StressTestUtils.jMeterSlaveKey.invalidateAll();
             } catch (Exception e) {
                 //保存状态，执行出现异常
                 throw new RRException("停止所有脚本活动操作出现异常");

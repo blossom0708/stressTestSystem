@@ -44,8 +44,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
 import java.util.*;
 
 @Service("stressTestFileService")
@@ -452,6 +451,24 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         return "master主机压测开始！";
     }
 
+    /***
+     * 测试主机Host的port端口是否被使用（目前只针对Script脚本模式，脚本运行容易端口冲突）
+     * @param host
+     * @param port
+     */
+    public static boolean isPortUsing(String host,int port) {
+        boolean flag = false;
+        try {
+            InetAddress Address = InetAddress.getByName(host);
+            Socket socket = new Socket(Address,port);  //建立一个Socket连接
+            flag = true;
+            socket.close();
+        } catch (IOException e) {
+
+        }
+        return flag;
+    }
+
     /**
      * 执行Jmeter的脚本文件，采用Apache的commons-exec来执行。
      */
@@ -472,6 +489,18 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         // -t 设置JMX脚本路径
         cmdLine.addArgument("-t");
         cmdLine.addArgument("${jmxFile}");
+        // 固定client分布式测试数据传输端口（针对防火墙或docker环境），固定端口在该模式下多任务运行会冲突
+        int clientRmiLocalPort = new StressTestUtils().MasterClientRmiLocalPort();
+        if(clientRmiLocalPort > 0) {
+            for(int i=0;i<2;i++) {
+                int usePort = clientRmiLocalPort + i;
+                if(isPortUsing("0.0.0.0",usePort)) {
+                    // 固定client.rmi.localport端口，在多脚本同时运行，或api模式切换到script模式都会端口冲突（所以切换后要重启服务）
+                    throw new RRException("端口"+usePort+"被占用，请等待释放或重启服务或改为不固定端口！");
+                }
+            }
+            cmdLine.addArgument("-Dclient.rmi.localport=" + clientRmiLocalPort);
+        }
 
         String slaveStr = stressTestFile.getSlaveStr();
         if (StringUtils.isNotEmpty(slaveStr)) {

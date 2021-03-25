@@ -238,6 +238,11 @@ public class StressTestUtils {
      */
     public final static String REPLACE_BACKENDLISTENER_NAME_KEY = "REPLACE_BACKENDLISTENER_NAME_KEY";
 
+    /**
+     * 是否设置client.rmi.localport，针对防火墙或docker环境下需要固定端口的需求
+     */
+    public final static String MASTER_CLIENT_RMI_LOCALPORT = "MASTER_CLIENT_RMI_LOCALPORT";
+
     public static String getJmeterHome() {
         String jmeterHome = sysConfigService.getValue(MASTER_JMETER_HOME_KEY);
         // 通过符号~来表示user_home（操作系统用户目录，兼容Linux和Windows）
@@ -300,6 +305,16 @@ public class StressTestUtils {
         } catch (Exception e) {
             return 14400;
         }
+    }
+
+    public int MasterClientRmiLocalPort() {
+        int port = 0;
+        try {
+            port = Integer.parseInt(sysConfigService.getValue(MASTER_CLIENT_RMI_LOCALPORT));
+        } catch (Exception e) {
+            return 0;
+        }
+        return port;
     }
 
     public static String getSuffix4() {
@@ -480,6 +495,10 @@ public class StressTestUtils {
         }
 
         jmeterProps.put("jmeter.version", JMeterUtils.getJMeterVersion());
+        // 配置client.rmi.localport，如配置端口60000，在防火墙环境下就要开放60000-60002三个端口，docker下要向外映射对应端口
+        if(MasterClientRmiLocalPort() > 0) {
+            JMeterUtils.setProperty("client.rmi.localport", Integer.toString(MasterClientRmiLocalPort()));
+        }
     }
     
     /**

@@ -458,6 +458,9 @@ public class StressTestFileServiceImpl implements StressTestFileService {
      */
     public static boolean isPortUsing(String host,int port) {
         boolean flag = false;
+        if(port < 10) {
+            return false;
+        }
         try {
             InetAddress Address = InetAddress.getByName(host);
             Socket socket = new Socket(Address,port);  //建立一个Socket连接
@@ -489,13 +492,19 @@ public class StressTestFileServiceImpl implements StressTestFileService {
         // -t 设置JMX脚本路径
         cmdLine.addArgument("-t");
         cmdLine.addArgument("${jmxFile}");
-        // 固定client分布式测试数据传输端口（针对防火墙或docker环境），固定端口在该模式下多任务运行会冲突
-        int clientRmiLocalPort = new StressTestUtils().MasterClientRmiLocalPort();
-        if(clientRmiLocalPort > 0) {
+        // 设置client分布式测试数据传输端口（针对防火墙或docker环境），脚本模式下如果配置文件设置了端口则以配置文件为优先级
+        int clientRmiLocalPort = -1;
+        if (stressTestUtils.DefaultClientRmiLocalPort() >= 0) {
+            clientRmiLocalPort = stressTestUtils.DefaultClientRmiLocalPort();
+            int usePort = clientRmiLocalPort + 1;
+            if(isPortUsing("0.0.0.0",usePort)) {
+                throw new RRException("端口"+usePort+"被占用，请等待释放或将配置文件端口改为不固定！");
+            }
+        } else if (stressTestUtils.MasterClientRmiLocalPort() >= 0) {
+            clientRmiLocalPort = stressTestUtils.MasterClientRmiLocalPort();
             for(int i=0;i<2;i++) {
                 int usePort = clientRmiLocalPort + i;
                 if(isPortUsing("0.0.0.0",usePort)) {
-                    // 固定client.rmi.localport端口，在多脚本同时运行，或api模式切换到script模式都会端口冲突（所以切换后要重启服务）
                     throw new RRException("端口"+usePort+"被占用，请等待释放或重启服务或改为不固定端口！");
                 }
             }

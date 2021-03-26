@@ -308,11 +308,11 @@ public class StressTestUtils {
     }
 
     public int MasterClientRmiLocalPort() {
-        int port = 0;
+        int port = -1;
         try {
             port = Integer.parseInt(sysConfigService.getValue(MASTER_CLIENT_RMI_LOCALPORT));
         } catch (Exception e) {
-            return 0;
+            return -1;
         }
         return port;
     }
@@ -495,10 +495,24 @@ public class StressTestUtils {
         }
 
         jmeterProps.put("jmeter.version", JMeterUtils.getJMeterVersion());
-        // 配置client.rmi.localport，如配置端口60000，在防火墙环境下就要开放60000-60002三个端口，docker下要向外映射对应端口
-        if(MasterClientRmiLocalPort() > 0) {
+        // 配置client.rmi.localport，如配置端口60000（api模式会覆盖配置文件），在防火墙环境下就要开放60000-60002三个端口，docker下要向外映射对应端口
+        if(MasterClientRmiLocalPort() >= 0) {
             JMeterUtils.setProperty("client.rmi.localport", Integer.toString(MasterClientRmiLocalPort()));
         }
+    }
+
+    // 获取配置文件的client.rmi.localport，主要用于脚本压测模式的端口判断（脚本模式下，如果配置文件设置了端口，则以配置文件为准）
+    public int DefaultClientRmiLocalPort() {
+        String jmeterHomeBin = getJmeterHomeBin();
+        JMeterUtils.loadJMeterProperties(jmeterHomeBin + File.separator + "jmeter.properties");
+        int port = 0;
+        try {
+            port = Integer.parseInt(JMeterUtils.getPropDefault("client.rmi.localport", ""));
+        } catch (Exception e) {
+            return -1;
+        }
+
+        return port;
     }
     
     /**

@@ -118,6 +118,9 @@ public class LocalReportGenerator {
 
     private final File testFile;
     private final ReportGeneratorConfiguration configuration;
+    // 获取jmeter的大版本号，4和5区别对待
+    private static int jmeterVersion =
+            Integer.parseInt(String.valueOf(JMeterUtils.getJMeterVersion().charAt(0)));
 
     /**
      * ResultCollector used
@@ -378,7 +381,7 @@ public class LocalReportGenerator {
                         propertyValue, setterName);
             }
             // smooth00 fix，这块调用graph.initialize()，这个方法5.0以前版本没有，所以改成java反射机制动态执行
-            if ( Integer.parseInt(String.valueOf(JMeterUtils.getJMeterVersion().charAt(0))) >= 5 ){
+            if ( jmeterVersion >= 5 ){
                 graph.getClass().getMethod("initialize", new Class[]{}).invoke(graph, new Object[]{});
             }
 
@@ -399,6 +402,13 @@ public class LocalReportGenerator {
             throws GenerationException {
         // Instantiate the class from the classname
         String className = exporterConfiguration.getClassName();
+        if ( jmeterVersion >= 5 ){ // 为了让jmeter5.1~5.4兼容，改为调用重写的类
+            if(className.contains("JsonExporter")) {
+                className = "io.renren.modules.test.jmeter.report.LocalJsonExporter";
+            } else if(className.contains("HtmlTemplateExporter")) {
+                className = "io.renren.modules.test.jmeter.report.LocalHtmlTemplateExporter";
+            }
+        }
         try {
             Class<?> clazz = Class.forName(className);
             Object obj = clazz.getDeclaredConstructor().newInstance();

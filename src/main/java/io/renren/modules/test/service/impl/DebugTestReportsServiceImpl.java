@@ -136,10 +136,10 @@ public class DebugTestReportsServiceImpl implements DebugTestReportsService {
     @Async("asyncServiceExecutor")
     public void createReport(Long[] reportIds) {
         for (Long reportId : reportIds) {
-        	createReport(reportId);
+            createReport(reportId);
         }
     }
-    
+
     /**
      * 采用异步线程池来实现。
      */
@@ -150,7 +150,10 @@ public class DebugTestReportsServiceImpl implements DebugTestReportsService {
         DebugTestReportsEntity debugTestReport = queryObject(reportId);
       //首先判断，如果file_size为0或者空，说明没有结果文件，直接报错打断。
         if (debugTestReport.getFileSize() == 0L || debugTestReport.getFileSize() == null) {
-            throw new RRException("找不到调试测试结果文件，无法生成测试报告！");
+            debugTestReport.setStatus(StressTestUtils.NO_FILE);
+            update(debugTestReport);
+            logger.error("找不到调试测试结果文件，无法生成测试报告！");
+            return;
         }
 
         String casePath = stressTestUtils.getCasePath();
@@ -164,7 +167,10 @@ public class DebugTestReportsServiceImpl implements DebugTestReportsService {
         //如果测试报告文件目录已经存在，说明生成过测试报告，直接打断
         File reportDir = new File(reportPath);
         if (reportDir.exists()) {
-            throw new RRException("已经存在测试报告不要重复创建！");
+            debugTestReport.setStatus(StressTestUtils.RUN_SUCCESS);
+            update(debugTestReport);
+            logger.error("已经存在调试报告不要重复创建！");
+            return;
         }
 
         Source srcJtl = new StreamSource(new File(jtlPath));

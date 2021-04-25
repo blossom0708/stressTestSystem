@@ -32,12 +32,14 @@ $(function () {
                     return '<span class="label label-success">执行成功</span>';
                 } else if (value === 3) {
                     return '<span class="label label-danger">出现异常</span>';
+                } else if (value === 4) {
+                    return '<span class="label label-danger">文件缺失</span>';
                 }
             }
             },
             {
                 label: '执行操作', name: '', width: 80, sortable: false, formatter: function (value, options, row) {
-                var createReportBtn = "<a href='#' class='btn btn-primary' onclick='createReport(" + row.reportId + ")' ><i class='fa fa-plus'></i>&nbsp;生成报告</a>";
+                var createReportBtn = "<a href='#' class='btn btn-primary' onclick='createReport(" + row.reportId + "," + row.status + ")' ><i class='fa fa-plus'></i>&nbsp;生成报告</a>";
                 var downloadReportBtn = "&nbsp;&nbsp;<a href='" + baseURL + "test/debugReports/downloadReport/" + row.reportId + "' class='btn btn-primary' onclick='return checkStatus(" + row.status + ")'><i class='fa fa-download'></i>&nbsp;下载</a>";
                 return createReportBtn + downloadReportBtn;
             }
@@ -212,11 +214,15 @@ var vm = new Vue({
     }
 });
 
-function createReport(reportIds) {
+function createReport(reportIds, status) {
     if (!reportIds) {
         return;
     }
-    confirm('结果文件超过1MB建议直接下载报告查看!', function () {
+    if (2 == status) {
+        alert('已创建过调试报告，不要重复创建！');
+        return;
+    }
+    confirm('结果文件超过10MB建议直接下载报告查看!', function () {
         $.ajax({
             type: "POST",
             url: baseURL + "test/debugReports/createReport",

@@ -11,6 +11,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.jmeter.util.BeanShellServer;
 import org.apache.jmeter.util.JMeterUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -242,6 +243,11 @@ public class StressTestUtils {
      * 是否设置client.rmi.localport，针对防火墙或docker环境下需要固定端口的需求
      */
     public final static String MASTER_CLIENT_RMI_LOCALPORT = "MASTER_CLIENT_RMI_LOCALPORT";
+    /**
+     * 是否设置beanshell.server.port，以配置文件的设置为优先级，配置文件未设置则以该配置为准
+     */
+    public final static String SET_BEANSHELL_SERVER_PORT = "SET_BEANSHELL_SERVER_PORT";
+    private int bsh_port = -1; //临时存储配置文件的beanshell.server.port
 
     public static String getJmeterHome() {
         String jmeterHome = sysConfigService.getValue(MASTER_JMETER_HOME_KEY);
@@ -499,6 +505,12 @@ public class StressTestUtils {
         if(MasterClientRmiLocalPort() >= 0) {
             JMeterUtils.setProperty("client.rmi.localport", Integer.toString(MasterClientRmiLocalPort()));
         }
+        // 从配置文件获取beanshell.server.port，api模式以配置文件的配置为优先级（脚本模式只能按配置文件）
+        try {
+            bsh_port = Integer.parseInt(JMeterUtils.getPropDefault("beanshell.server.port", ""));
+        } catch (Exception e) {
+            bsh_port = -1;
+        }
     }
 
     // 获取配置文件的client.rmi.localport，主要用于脚本压测模式的端口判断（脚本模式下，如果配置文件设置了端口，则以配置文件为准）
@@ -508,6 +520,37 @@ public class StressTestUtils {
         int port = 0;
         try {
             port = Integer.parseInt(JMeterUtils.getPropDefault("client.rmi.localport", ""));
+        } catch (Exception e) {
+            return -1;
+        }
+
+        return port;
+    }
+
+    /**
+     * 启动可选服务，暂时只添加beanshellServer服务
+     * @param bshport
+     */
+    public void startOptionalServers(int bshport) {
+        String jmeterHomeBinPath = getJmeterHomeBin() + File.separator;
+        // int bshport = JMeterUtils.getPropDefault("beanshell.server.port", 0);// $NON-NLS-1$
+        String bshfile = jmeterHomeBinPath +
+                JMeterUtils.getPropDefault("beanshell.server.file", "");// $NON-NLS-1$ $NON-NLS-2$
+        if (bshport > 0) {
+            logger.info("Starting Beanshell server ({},{})", bshport, bshfile);
+            Runnable t = new BeanShellServer(bshport, bshfile);
+            t.run(); // NOSONAR we just evaluate some code here
+        }
+    }
+
+    // 用于外部获取当前的beanshell.server.port
+    public int getBeanShellServerPort() {
+        int port = -1;
+        if(bsh_port > 0) { //bsh_port优先保存的是配置文件的配置端口
+            return bsh_port;
+        }
+        try {
+            port = Integer.parseInt(sysConfigService.getValue(SET_BEANSHELL_SERVER_PORT));
         } catch (Exception e) {
             return -1;
         }

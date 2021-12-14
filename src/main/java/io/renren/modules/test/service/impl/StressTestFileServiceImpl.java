@@ -409,6 +409,12 @@ public class StressTestFileServiceImpl implements StressTestFileService {
                 excuteJmeterRunByScript(stressTestFile, stressTestReports, map);
             } else {
                 excuteJmeterRunLocal(stressTestFile, stressTestReports, map);
+                // 添加可选服务启动（暂时只针对BeanShellServer）
+                int bshport = stressTestUtils.getBeanShellServerPort();
+                if (bshport > 0 && !isPortUsing("0.0.0.0",bshport)) {
+                    // beanshell.server.port已设置，并且端口未被占用
+                    stressTestUtils.startOptionalServers(bshport);
+                }
             }
         }catch(RRException e) {
             // 解决BUG：分布式情况下禁止调试，却无法在前端提示。修复后会提示用户“请关闭调试模式！”

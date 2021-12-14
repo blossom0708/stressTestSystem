@@ -543,6 +543,7 @@ INSERT INTO sys_config (id, key, value, status, remark) VALUES ('7', 'SCRIPT_SCH
 INSERT INTO sys_config (id, key, value, status, remark) VALUES ('8', 'JMETER_THREADGROUP_SET_KEY', 'false', '1', 'true：开启线程组管理功能，上传脚本时线程组配置将入库管理，默认false。');
 INSERT INTO sys_config (id, key, value, status, remark) VALUES ('9', 'REPLACE_BACKENDLISTENER_NAME_KEY', 'false', '1', 'true：上传脚本时自动替换BackendListener后端监听器的名称（规则是原名称+脚本名称），默认false。');
 INSERT INTO sys_config (id, key, value, status, remark) VALUES ('11', 'MASTER_CLIENT_RMI_LOCALPORT', '-1', '1', '默认-1，按配置文件；0，不固定端口；固定端口如60000，在防火墙下就要同时开放60000~60002三个传输端口（api模式换端口要重启服务）');
+INSERT INTO sys_config (id, key, value, status, remark) VALUES ('12', 'SET_BEANSHELL_SERVER_PORT', '-1', '1', '使用配置文件的beanshell.server.port端口，如果配置文件未设置，则使用该参数配置（-1不开启，一般设为9000，脚本压测模式必须在配置文件配置）');
 
 CREATE TABLE test_stress_thread_set (
   set_id varchar(40) NOT NULL,

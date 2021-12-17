@@ -71,12 +71,30 @@
 				"elementType" 		: { "path" : "name()"  },
 				"elementEnabled" 	: { "path" : "@enabled" ,"type" : "boolean" },
 				"onSampleError"		: { "path" : "stringProp[@name='ThreadGroup.on_sample_error']" },
-				"TargetLevel"		: { "path" : "stringProp[@name='TargetLevel']" , 					"type" : "number"},
-				"RampUp"			: { "path" : "stringProp[@name='RampUp']" , 						"type" : "number"},
-				"Steps"	    		: { "path" : "stringProp[@name='Steps']" , 						    "type" : "number"},
-				"Hold"	    		: { "path" : "stringProp[@name='Hold']" , 						    "type" : "number"},
+				"TargetLevel"		: { "path" : "stringProp[@name='TargetLevel']" },
+				"RampUp"			: { "path" : "stringProp[@name='RampUp']" },
+				"Steps"	    		: { "path" : "stringProp[@name='Steps']" },
+				"Hold"	    		: { "path" : "stringProp[@name='Hold']" },
 				"LogFilename"	    : { "path" : "stringProp[@name='LogFilename']" },
-				"Iterations"	    : { "path" : "stringProp[@name='Iterations']" ,						"type" : "number"},
+				"Iterations"	    : { "path" : "stringProp[@name='Iterations']"},
+				"Unit"				: { "path" : "stringProp[@name='Unit']" }
+			}
+		}
+	},
+	"com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" : {
+		"edit" : {
+			"attrs":{
+				"elementName"		: { "path" : "@testname"  },		
+				"elementType" 		: { "path" : "name()"  },
+				"elementEnabled" 	: { "path" : "@enabled" ,"type" : "boolean" },
+				"onSampleError"		: { "path" : "stringProp[@name='ThreadGroup.on_sample_error']" },
+				"TargetLevel"		: { "path" : "stringProp[@name='TargetLevel']" },
+				"RampUp"			: { "path" : "stringProp[@name='RampUp']" },
+				"Steps"	    		: { "path" : "stringProp[@name='Steps']" },
+				"Hold"	    		: { "path" : "stringProp[@name='Hold']" },
+				"LogFilename"	    : { "path" : "stringProp[@name='LogFilename']" },
+				"Iterations"	    : { "path" : "stringProp[@name='Iterations']"},
+				"ConcurrencyLimit"	    : { "path" : "stringProp[@name='ConcurrencyLimit']"},
 				"Unit"				: { "path" : "stringProp[@name='Unit']" }
 			}
 		}

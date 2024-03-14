@@ -255,6 +255,7 @@ public class StressTestUtils {
         if(jmeterHome.substring(0,1).equals("~")) {
             jmeterHome = jmeterHome.replace("~",System.getProperty("user.home"));
         }
+        System.out.println("jmeterHome------------------------"+jmeterHome);
     	return jmeterHome;
     }
 

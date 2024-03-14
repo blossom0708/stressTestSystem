@@ -441,7 +441,7 @@ CREATE TABLE `test_stress_slave` (
 INSERT INTO `test_stress_slave` (`slave_id`, `slave_name`, `ip`, `jmeter_port`, `user_name`, `passwd`, `ssh_port`, `home_dir`, `status`, `add_time`, `add_by`, `update_time`, `update_by`) VALUES ('1', 'LocalHost', '127.0.0.1', '1099', NULL, NULL, '22', '', '0', '2018-06-18 18:18:18', NULL, '2018-06-18 18:18:18', NULL);
 
 -- 数据库中配置性能压测配置信息。key不要变。
-INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('2', 'MASTER_JMETER_HOME_KEY', 'D:/apache-jmeter-5.6.2', '1', '本地Jmeter_home绝对路径（Jmeter版本不要高于引擎版本；~表示用户目录）');
+INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('2', 'MASTER_JMETER_HOME_KEY', 'D:/apache-jmeter-5.6.2', '1', '本地Jmeter_home绝对路径(直接用绝对路径)');
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('3', 'MASTER_JMETER_CASES_HOME_KEY', 'D:/apache-jmeter-5.6.2/stressTestCases', '1', '本地保存用例数据的绝对路径，不要随意切换会导致文件找不到错误。');
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('4', 'MASTER_JMETER_USE_SCRIPT_KEY', 'false', '1', 'false:在服务器进程内启动Jmeter压测。true:启动Jmeter_home中的命令压测');
 INSERT INTO `sys_config` (`id`, `key`, `value`, `status`, `remark`) VALUES ('5', 'MASTER_JMETER_REPLACE_FILE_KEY', '1', '1', '0：同名文件禁止上传；1：同名文件上传覆盖（禁止上传第二个）；2：允许不同用例的同名文件（支持上传覆盖）；默认值1');
